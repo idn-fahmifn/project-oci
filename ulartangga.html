@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ular Tangga Matematika Hewan</title>
+  <meta name="description" content="Game ular tangga matematika interaktif untuk siswa SD kelas III — operasi hitung campuran.">
+  <link rel="icon" href="asset/logo.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/ulartangga.css">
+</head>
+<body>
+  <!-- Top Bar: Back + Audio -->
+  <div class="top-btn-bar">
+    <a href="index.html" class="back-btn" tabindex="0" aria-label="Back to Home">
+      <svg class="icon-home" viewBox="0 0 32 32">
+        <path d="M17 28v-8h-2v8H8V18H4.586L16 6.586 27.414 18H24v10h-7Zm-8-12V28.001 16Zm14 12h3V17h2.414L16 4.586 3.586 17H6v11h4v-8a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v8Z"/>
+      </svg>
+    </a>
+    <button id="muteToggleBtn" class="mute-toggle-btn" aria-label="Mute / Unmute Audio" title="Mute / Unmute">
+      <svg id="icon-mute-toggle" viewBox="0 0 24 24" fill="none" stroke="#FBB904" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+        <polygon id="icon-mute-toggle-polygon" points="9 9 13 9 17 5 17 19 13 15 9 15 9 9"/>
+        <line id="icon-mute-toggle-line" x1="19" y1="5" x2="19" y2="19"></line>
+      </svg>
+    </button>
+    <div class="audio-dropdown-container" style="position:absolute;left:0;top:69px;width:350px;max-width:90vw;">
+      <div id="audioDropdown" class="audio-dropdown">
+        <div class="audio-volume-slider-wrap">
+          <button class="audio-volume-mute-mini" id="audioMuteMiniBtn" type="button" aria-label="Mute/Unmute (Mini)">
+            <svg id="audioMuteMiniIcon" viewBox="0 0 24 24" fill="none" stroke="#FBB904" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon id="audioMuteMiniPoly" points="9 9 13 9 17 5 17 19 13 15 9 15 9 9"/>
+              <line id="audioMuteMiniLine" x1="19" y1="5" x2="19" y2="19"></line>
+            </svg>
+          </button>
+          <span class="audio-volume-min">0</span>
+          <input type="range" min="0" max="100" value="100" class="audio-volume-slider" id="audioVolumeSlider" aria-label="Volume">
+          <span class="audio-volume-max">100</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Welcome Modal -->
+  <div id="welcomeModal" class="modal-overlay" style="display:flex">
+    <div class="modal-simple">
+      <!-- Snake Mascot -->
+      <div class="welcome-mascot">
+        <svg viewBox="0 0 80 80" class="snake-mascot-svg">
+          <ellipse cx="40" cy="28" rx="22" ry="18" fill="#4caf50"/>
+          <ellipse cx="40" cy="28" rx="18" ry="15" fill="#66bb6a"/>
+          <circle cx="33" cy="24" r="5" fill="white"/><circle cx="47" cy="24" r="5" fill="white"/>
+          <circle cx="34" cy="24" r="2.5" fill="#1a1a1a"/><circle cx="48" cy="24" r="2.5" fill="#1a1a1a"/>
+          <ellipse cx="40" cy="33" rx="6" ry="2.5" fill="#388e3c"/>
+          <path d="M36 33 Q40 38 44 33" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M25 42 Q20 55 30 62 Q40 68 50 62 Q60 55 55 42" fill="#4caf50" stroke="none"/>
+          <path d="M28 44 Q23 55 32 60 Q40 64 48 60 Q57 55 52 44" fill="#66bb6a" stroke="none"/>
+        </svg>
+      </div>
+      <h2>Ayo Main Ular Tangga Matematika!</h2>
+      <p>Permainan ini dirancang untuk latihan kelas yang seru dan mudah dimengerti. Pilih mode 2-4 pemain, lalu putar dadu untuk menentukan siapa mulai.</p>
+      <p>Setiap angka dadumu jadi tantangan soal matematika. Jawab benar untuk maju, jika salah maka tetap di tempat dan giliran berikutnya.</p>
+      <div class="lkpd-notice">
+        <div class="lkpd-icon">📋</div>
+        <div class="lkpd-text">
+          <strong>Persiapan LKPD:</strong> Siapkan LKPD atau kertas untuk setiap kelompok. Catat setiap soal dan jawaban yang muncul selama permainan. LKPD dikumpulkan setelah permainan selesai!
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="win-modal-btn" onclick="closeWelcome()">Siap, Mulai!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode Selection Modal -->
+  <div id="modeModal" class="modal-overlay">
+    <div class="modal-simple">
+      <h2>Pilih Jumlah Pemain</h2>
+      <p>Pilih game mode 2, 3, atau 4 pemain. Setiap pemain akan otomatis menggunakan karakter hewan yang tersedia.</p>
+      <div class="modal-actions">
+        <button class="win-modal-btn" onclick="selectMode(2)">2 Pemain</button>
+        <button class="win-modal-btn" onclick="selectMode(3)">3 Pemain</button>
+        <button class="win-modal-btn" onclick="selectMode(4)">4 Pemain</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Order Modal -->
+  <div id="startOrderModal" class="modal-overlay">
+    <div class="modal-simple">
+      <h2>Siapa yang Mulai?</h2>
+      <p id="startOrderText">Setiap pemain memutar dadu untuk menentukan giliran mulai. Nilai dadu terbesar akan jadi pemain pertama.</p>
+      <div class="start-dice-stage">
+        <div id="startPlayerChip" class="start-player-chip">Siap mulai</div>
+        <div id="startDiceFace" class="dice-face start-dice-face" data-value="1">
+          <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+          <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+          <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+        </div>
+      </div>
+      <div id="startOrderResult" class="start-order-result">-</div>
+      <ul id="startOrderList" class="start-order-list"></ul>
+      <div class="modal-actions">
+        <button class="win-modal-btn" id="startOrderDiceBtn" onclick="rollStartOrderDice()">Putar Dadu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Panel -->
+  <div class="status-panel">
+    <div class="timer-box">
+      Waktu main: <span id="timerDisplay">00:00</span>
+    </div>
+    <div class="scoreboard">
+      <h3>Papan Posisi</h3>
+      <div id="scoreboardList"></div>
+    </div>
+  </div>
+
+  <!-- Game Board -->
+  <div class="game-wrapper">
+    <div class="board-container">
+      <div id="p0" class="token" style="padding:0"></div>
+      <div id="p1" class="token" style="padding:0"></div>
+      <div id="p2" class="token" style="padding:0"></div>
+      <div id="p3" class="token" style="padding:0"></div>
+      <div class="board" id="board"></div>
+      <svg class="overlay" id="pathOverlay" width="100%" height="100%" viewBox="0 0 760 540" preserveAspectRatio="none"></svg>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="dice-box" id="diceBtn" onclick="rollDice()">
+        <span class="dice-label">PUTAR</span>
+        <span class="dice-face dice-value" data-value="1">
+          <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+          <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+          <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+        </span>
+      </div>
+      <div class="info-panel">
+        <div class="turn-text">
+          Giliran: <span id="current-player-name" class="turn-highlight" style="color:#ff5722"></span>
+        </div>
+        <div id="diceStatus" class="dice-display">Klik dadu untuk pilih tantangan.</div>
+      </div>
+      <button class="btn-reset" onclick="resetGame()">Mulai Ulang</button>
+    </div>
+  </div>
+
+  <!-- Background Audio -->
+  <audio id="backgroundAudio" src="audio.mp3" loop></audio>
+
+  <!-- Quiz Modal -->
+  <div id="quizModal" class="modal-overlay">
+    <div class="modal-box">
+      <span id="quizIcon" class="quiz-animal">
+        <img src="https://img.icons8.com/?size=100&id=7uJob2d9mFBS&format=png&color=000000" alt="Harimau" style="width:38px;height:38px;vertical-align:middle" id="quizIconTiger">
+      </span>
+      <h3>Tantangan Matematika</h3>
+      <div id="quizQuestion" class="quiz-question">5 + 5 = ?</div>
+      <input type="number" id="quizAnswer" class="quiz-input" placeholder="Jawaban">
+      <div id="error-msg"></div>
+      <button class="btn-submit" onclick="checkAnswer()">KIRIM JAWAB</button>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="successModal" class="modal-overlay" style="background:rgba(0,0,0,0.45)">
+    <div class="feedback-card" id="feedbackBox">
+      <!-- Snake Mascot in feedback -->
+      <div class="feedback-mascot">
+        <svg viewBox="0 0 80 80" class="snake-mascot-svg feedback-snake">
+          <ellipse cx="40" cy="28" rx="22" ry="18" fill="#4caf50"/>
+          <ellipse cx="40" cy="28" rx="18" ry="15" fill="#66bb6a"/>
+          <circle cx="33" cy="24" r="5" fill="white"/><circle cx="47" cy="24" r="5" fill="white"/>
+          <circle cx="34" cy="24" r="2.5" fill="#1a1a1a"/><circle cx="48" cy="24" r="2.5" fill="#1a1a1a"/>
+          <ellipse cx="40" cy="33" rx="6" ry="2.5" fill="#388e3c"/>
+          <path d="M36 33 Q40 38 44 33" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M25 42 Q20 55 30 62 Q40 68 50 62 Q60 55 55 42" fill="#4caf50" stroke="none"/>
+          <path d="M28 44 Q23 55 32 60 Q40 64 48 60 Q57 55 52 44" fill="#66bb6a" stroke="none"/>
+        </svg>
+      </div>
+      <div class="feedback-badge" id="feedbackBadge">BENAR!</div>
+      <div class="feedback-text" id="resultFeedbackText">Hebat! Jawabanmu benar.</div>
+      <button class="feedback-btn" id="feedbackBtn" onclick="closeFeedback()">Lanjutkan</button>
+    </div>
+  </div>
+
+  <!-- Kelebihan Langkah Popup -->
+  <div id="popupKelebihanModal" class="modal-overlay" style="z-index:2001">
+    <div class="modal-simple">
+      <div class="warn-emoji">⚠️</div>
+      <h2>Kelebihan langkah!</h2>
+      <p>Tunggu giliran depan ya.</p>
+      <button class="btn-close-popup" onclick="closeKelebihanPopup()">Tutup</button>
+    </div>
+  </div>
+
+  <!-- Win Modal -->
+  <div id="winModal" class="win-modal-overlay">
+    <div class="win-modal-box">
+      <div class="win-modal-emoji" id="winEmoji"></div>
+      <div class="win-modal-title" id="winText"></div>
+      <div class="win-modal-sub">SELAMAT!</div>
+      <div class="podium-stage" id="podiumStage">
+        <!-- Podium will be rendered by JS -->
+      </div>
+      <ul class="podium-list" id="podiumList"></ul>
+      <div class="win-modal-btns">
+        <button class="win-modal-btn" id="btnPlayAgain" onclick="handlePlayAgainGame()">Bermain Lagi</button>
+        <button class="win-modal-btn" id="btnHome" onclick="goToHome()">Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Music (duplicate kept for compatibility) -->
+  <audio id="bgMusic" loop style="display:none">
+    <source src="audio.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const board = document.getElementById("board");
+    const diceBtn = document.getElementById("diceBtn");
+    const nameLabel = document.getElementById("current-player-name");
+    const quizModal = document.getElementById("quizModal");
+    const feedbackModal = document.getElementById("successModal");
+    const quizQuestionEl = document.getElementById("quizQuestion");
+    const quizInput = document.getElementById("quizAnswer");
+    const errorMsg = document.getElementById("error-msg");
+    const quizIcon = document.getElementById("quizIcon");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const scoreboardList = document.getElementById("scoreboardList");
+    const diceStatus = document.getElementById("diceStatus");
+    const startOrderText = document.getElementById("startOrderText");
+    const startOrderList = document.getElementById("startOrderList");
+    const startOrderResult = document.getElementById("startOrderResult");
+    const startOrderDiceBtn = document.getElementById("startOrderDiceBtn");
+    const resultFeedbackText = document.getElementById("resultFeedbackText");
+    const feedbackIcon = document.getElementById("feedbackIcon");
+    const winText = document.getElementById("winText");
+    const winEmoji = document.getElementById("winEmoji");
+    const podiumList = document.getElementById("podiumList");
+
+    const tigerIconUrl =
+      "https://img.icons8.com/?size=100&id=7uJob2d9mFBS&format=png&color=000000";
+    const giraffeIconUrl =
+      "https://img.icons8.com/?size=100&id=gtx2QwlbvAak&format=png&color=000000";
+    const bearIconUrl =
+      "https://img.icons8.com/?size=100&id=VbxKFvBFUSfq&format=png&color=000000";
+    const jerapahIconUrl =
+      "https://img.icons8.com/?size=100&id=uEwiPVltqhdZ&format=png&color=000000";
+
+    const animalOptions = [
+      {
+        id: "Harimau",
+        label: "Harimau",
+        icon: tigerIconUrl,
+        color: "#FF5722",
+      },
+      { id: "Rubah", label: "Rubah", icon: giraffeIconUrl, color: "#4CAF50" },
+      {
+        id: "Beruang",
+        label: "Beruang",
+        icon: bearIconUrl,
+        color: "#795548",
+      },
+      {
+        id: "Jerapah",
+        label: "Jerapah",
+        icon: jerapahIconUrl,
+        color: "#8d6e63",
+      },
+    ];
+
+    /* ---- 50 Fixed Question Bank (3 levels) ---- */
+    const questionBank = [
+      // MUDAH (1-17) — perkalian & pembagian sederhana
+      { q: "2 x 3 = ?", a: 6 },
+      { q: "4 x 2 = ?", a: 8 },
+      { q: "5 x 3 = ?", a: 15 },
+      { q: "3 x 6 = ?", a: 18 },
+      { q: "7 x 2 = ?", a: 14 },
+      { q: "6 x 4 = ?", a: 24 },
+      { q: "8 x 3 = ?", a: 24 },
+      { q: "9 x 2 = ?", a: 18 },
+      { q: "10 : 2 = ?", a: 5 },
+      { q: "12 : 3 = ?", a: 4 },
+      { q: "15 : 5 = ?", a: 3 },
+      { q: "18 : 6 = ?", a: 3 },
+      { q: "20 : 4 = ?", a: 5 },
+      { q: "24 : 8 = ?", a: 3 },
+      { q: "14 : 7 = ?", a: 2 },
+      { q: "16 : 4 = ?", a: 4 },
+      { q: "21 : 3 = ?", a: 7 },
+      // SEDANG (18-34) — perkalian menyimpan & porogapit
+      { q: "12 x 4 = ?", a: 48 },
+      { q: "15 x 3 = ?", a: 45 },
+      { q: "13 x 5 = ?", a: 65 },
+      { q: "17 x 4 = ?", a: 68 },
+      { q: "14 x 6 = ?", a: 84 },
+      { q: "23 x 3 = ?", a: 69 },
+      { q: "16 x 5 = ?", a: 80 },
+      { q: "18 x 4 = ?", a: 72 },
+      { q: "36 : 6 = ?", a: 6 },
+      { q: "48 : 8 = ?", a: 6 },
+      { q: "56 : 7 = ?", a: 8 },
+      { q: "45 : 9 = ?", a: 5 },
+      { q: "72 : 8 = ?", a: 9 },
+      { q: "63 : 7 = ?", a: 9 },
+      { q: "54 : 6 = ?", a: 9 },
+      { q: "84 : 4 = ?", a: 21 },
+      { q: "96 : 8 = ?", a: 12 },
+      // SULIT (35-50) — soal cerita
+      { q: "Di toko ada 4 rak, setiap rak berisi 13 buku. Berapa jumlah semua buku?", a: 52 },
+      { q: "Ibu membeli 6 kantong jeruk, setiap kantong berisi 15 jeruk. Berapa semua jeruk?", a: 90 },
+      { q: "Pak Guru membagi 72 pensil ke 9 siswa sama rata. Berapa pensil setiap siswa?", a: 8 },
+      { q: "Di kandang ada 5 kelinci, setiap kelinci diberi 8 wortel. Berapa wortel total?", a: 40 },
+      { q: "Ada 84 kue dibagikan ke 7 piring sama rata. Berapa kue per piring?", a: 12 },
+      { q: "Ayah membeli 3 dus air mineral, setiap dus berisi 24 botol. Berapa jumlah botol?", a: 72 },
+      { q: "48 permen dibagi sama rata ke 6 anak. Berapa permen setiap anak?", a: 8 },
+      { q: "Ani membeli 5 bungkus stiker, setiap bungkus berisi 16 stiker. Berapa semua stiker?", a: 80 },
+      { q: "Ada 90 buku yang akan dimasukkan ke 6 kotak sama rata. Berapa buku per kotak?", a: 15 },
+      { q: "Ibu membuat 4 loyang kue, setiap loyang berisi 18 potong. Berapa jumlah potongan kue?", a: 72 },
+      { q: "60 balon dibagi ke 5 kelompok sama rata. Berapa balon setiap kelompok?", a: 12 },
+      { q: "Satu kelas ada 8 kelompok, setiap kelompok punya 7 anggota. Berapa siswa di kelas?", a: 56 },
+      { q: "Pak Tani panen 96 buah mangga, dimasukkan ke 8 keranjang sama rata. Berapa mangga per keranjang?", a: 12 },
+      { q: "Di perpustakaan ada 3 lemari, tiap lemari ada 25 buku. Berapa total buku?", a: 75 },
+      { q: "Guru membagikan 45 lembar kertas ke 5 kelompok sama rata. Berapa lembar per kelompok?", a: 9 },
+      { q: "Bu Ani membeli 7 kotak susu, setiap kotak berisi 12 sachet. Berapa jumlah sachet susu?", a: 84 },
+    ];
+    let usedQuestionIndices = [];
+
+    const boardRows = [
+      [29, 30, 31, 32, 33, 34, 35],
+      [28, 27, 26, 25, 24, 23, 22],
+      [15, 16, 17, 18, 19, 20, 21],
+      [14, 13, 12, 11, 10, 9, 8],
+      [1, 2, 3, 4, 5, 6, 7],
+    ];
+
+    const ladderAssets = [
+      { from: 3, to: 13 },
+      { from: 6, to: 17 },
+      { from: 10, to: 24 },
+      { from: 22, to: 32 },
+    ];
+
+    const snakeAssets = [
+      { from: 34, to: 19, color: "#2e7d32", control: [610, 150] },
+      { from: 28, to: 12, color: "#3e2723", control: [35, 280] },
+      { from: 26, to: 15, color: "#00897b", control: [165, 190] },
+      { from: 20, to: 11, color: "#c62828", control: [540, 350] },
+    ];
+
+    const shortcuts = {};
+    ladderAssets.forEach(({ from, to }) => {
+      shortcuts[from] = { dest: to, type: "ladder" };
+    });
+    snakeAssets.forEach(({ from, to }) => {
+      shortcuts[from] = { dest: to, type: "snake" };
+    });
+
+    const endCell = 35;
+    const maxGameSeconds = 20 * 60;
+
+    let activePlayers = [];
+    let turnIndex = 0;
+    let currentRoll = 0;
+    let currentPlayerForQuiz = null;
+    let correctAnswer = 0;
+    let isMoving = false;
+    let gameActive = false;
+    let timerInterval = null;
+    let startTime = null;
+    let orderSelectionIndex = 0;
+    let isStartOrderRolling = false;
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function showModal(id) {
+      const element = $(id);
+      if (element) element.style.display = "flex";
+    }
+
+    function hideModal(id) {
+      const element = $(id);
+      if (element) element.style.display = "none";
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function setDiceFace(faceElement, value) {
+      if (!faceElement) return;
+      faceElement.dataset.value = String(value);
+    }
+
+    function animateDiceFace(faceElement, duration = 700) {
+      if (!faceElement) return null;
+      faceElement.classList.add("rolling");
+      return setInterval(() => {
+        setDiceFace(faceElement, Math.floor(Math.random() * 6) + 1);
+      }, 90);
+    }
+
+    function stopDiceAnimation(faceElement, intervalId, value) {
+      if (intervalId) clearInterval(intervalId);
+      setDiceFace(faceElement, value);
+      if (faceElement) faceElement.classList.remove("rolling");
+    }
+
+    function getBoardPoint(cellNum) {
+      const viewWidth = 760;
+      const viewHeight = 540;
+      const cellWidth = viewWidth / 7;
+      const cellHeight = viewHeight / 5;
+      for (let row = 0; row < boardRows.length; row++) {
+        const col = boardRows[row].indexOf(cellNum);
+        if (col !== -1) {
+          return {
+            x: col * cellWidth + cellWidth / 2,
+            y: row * cellHeight + cellHeight / 2,
+          };
+        }
+      }
+      return { x: cellWidth / 2, y: viewHeight - cellHeight / 2 };
+    }
+
+    function createSvgElement(tag, attrs = {}) {
+      const element = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        tag,
+      );
+      Object.entries(attrs).forEach(([key, value]) => {
+        element.setAttribute(key, value);
+      });
+      return element;
+    }
+
+    function drawLadder(svg, asset) {
+      const start = getBoardPoint(asset.from);
+      const end = getBoardPoint(asset.to);
+      const dx = end.x - start.x;
+      const dy = end.y - start.y;
+      const length = Math.hypot(dx, dy) || 1;
+      const offsetX = (-dy / length) * 13;
+      const offsetY = (dx / length) * 13;
+      const group = createSvgElement("g");
+      const railA = {
+        x1: start.x + offsetX,
+        y1: start.y + offsetY,
+        x2: end.x + offsetX,
+        y2: end.y + offsetY,
+      };
+      const railB = {
+        x1: start.x - offsetX,
+        y1: start.y - offsetY,
+        x2: end.x - offsetX,
+        y2: end.y - offsetY,
+      };
+
+      group.appendChild(
+        createSvgElement("line", { ...railA, class: "ladder-rail" }),
+      );
+      group.appendChild(
+        createSvgElement("line", { ...railB, class: "ladder-rail" }),
+      );
+
+      const rungCount = Math.max(3, Math.floor(length / 52));
+      for (let i = 1; i <= rungCount; i++) {
+        const t = i / (rungCount + 1);
+        const centerX = start.x + dx * t;
+        const centerY = start.y + dy * t;
+        group.appendChild(
+          createSvgElement("line", {
+            x1: centerX + offsetX,
+            y1: centerY + offsetY,
+            x2: centerX - offsetX,
+            y2: centerY - offsetY,
+            class: "ladder-rung",
+          }),
+        );
+      }
+
+      svg.appendChild(group);
+    }
+
+    function drawSnake(svg, asset) {
+      const start = getBoardPoint(asset.from);
+      const end = getBoardPoint(asset.to);
+      const [controlX, controlY] = asset.control;
+      const pathD = `M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`;
+      const group = createSvgElement("g");
+
+      group.appendChild(
+        createSvgElement("path", {
+          d: pathD,
+          class: "snake-body",
+          stroke: asset.color,
+          "stroke-width": 24,
+        }),
+      );
+      group.appendChild(
+        createSvgElement("path", {
+          d: pathD,
+          class: "snake-highlight",
+        }),
+      );
+      group.appendChild(
+        createSvgElement("circle", {
+          cx: end.x,
+          cy: end.y,
+          r: 9,
+          fill: asset.color,
+          opacity: 0.9,
+        }),
+      );
+      group.appendChild(
+        createSvgElement("ellipse", {
+          cx: start.x,
+          cy: start.y,
+          rx: 19,
+          ry: 16,
+          fill: asset.color,
+          class: "snake-head",
+        }),
+      );
+      group.appendChild(
+        createSvgElement("circle", {
+          cx: start.x - 7,
+          cy: start.y - 5,
+          r: 5,
+          class: "snake-eye",
+        }),
+      );
+      group.appendChild(
+        createSvgElement("circle", {
+          cx: start.x + 7,
+          cy: start.y - 5,
+          r: 5,
+          class: "snake-eye",
+        }),
+      );
+      group.appendChild(
+        createSvgElement("circle", {
+          cx: start.x - 7,
+          cy: start.y - 5,
+          r: 2,
+          class: "snake-pupil",
+        }),
+      );
+      group.appendChild(
+        createSvgElement("circle", {
+          cx: start.x + 7,
+          cy: start.y - 5,
+          r: 2,
+          class: "snake-pupil",
+        }),
+      );
+      group.appendChild(
+        createSvgElement("path", {
+          d: `M ${start.x} ${start.y + 14} L ${start.x} ${start.y + 27} M ${start.x} ${start.y + 27} L ${start.x - 8} ${start.y + 35} M ${start.x} ${start.y + 27} L ${start.x + 8} ${start.y + 35}`,
+          class: "snake-tongue",
+        }),
+      );
+
+      svg.appendChild(group);
+    }
+
+    function renderBoardAssets() {
+      const pathOverlay = $("pathOverlay");
+      if (!pathOverlay) return;
+      pathOverlay.innerHTML = "";
+      ladderAssets.forEach((asset) => drawLadder(pathOverlay, asset));
+      snakeAssets.forEach((asset) => drawSnake(pathOverlay, asset));
+    }
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remaining = seconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(remaining).padStart(2, "0")}`;
+    }
+
+    function initBoard() {
+      board.innerHTML = "";
+      let rowIdx = 5;
+      boardRows.forEach((rowNums) => {
+        rowNums.forEach((num) => {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          cell.classList.add(rowIdx % 2 === 0 ? "row-even" : "row-odd");
+          cell.id = `cell-${num}`;
+          if (num === 1) cell.classList.add("start-cell");
+          if (num === endCell) cell.classList.add("end-cell");
+          cell.innerText = num === 1 ? "START" : num === endCell ? "FINISH" : num;
+          board.appendChild(cell);
+        });
+        rowIdx--;
+      });
+
+      // Draw winding path connecting cells
+      renderWindingPath();
+      renderBoardAssets();
+      updateAllPlayerPositions();
+    }
+
+    function renderWindingPath() {
+      const pathOverlay = $("pathOverlay");
+      if (!pathOverlay) return;
+      // Draw directional arrows on row-end turns
+      for (let row = 0; row < boardRows.length; row++) {
+        const rowNums = boardRows[row];
+        const lastNum = rowNums[rowNums.length - 1];
+        const firstNum = rowNums[0];
+        // Draw arrow connectors between rows (the winding turns)
+        if (row < boardRows.length - 1) {
+          const nextRow = boardRows[row + 1];
+          // Find which end connects
+          const lastCurrent = rowNums[rowNums.length - 1];
+          const firstCurrent = rowNums[0];
+          const lastNext = nextRow[nextRow.length - 1];
+          const firstNext = nextRow[0];
+          // Cells are sequential, so check adjacency
+          if (Math.abs(lastCurrent - firstNext) === 1 || Math.abs(lastCurrent - lastNext) === 1 ||
+              Math.abs(firstCurrent - firstNext) === 1 || Math.abs(firstCurrent - lastNext) === 1) {
+            // Find the two adjacent cells
+            let from, to;
+            if (Math.abs(lastCurrent - lastNext) === 1) { from = Math.max(lastCurrent, lastNext) === lastCurrent ? lastCurrent : lastNext; to = from === lastCurrent ? lastNext : lastCurrent; }
+            else if (Math.abs(lastCurrent - firstNext) === 1) { from = lastCurrent; to = firstNext; }
+            else if (Math.abs(firstCurrent - lastNext) === 1) { from = firstCurrent; to = lastNext; }
+            else { from = firstCurrent; to = firstNext; }
+
+            // Ensure from < to for path direction
+            if (from > to) { const tmp = from; from = to; to = tmp; }
+
+            const p1 = getBoardPoint(from);
+            const p2 = getBoardPoint(to);
+            const arrow = createSvgElement("line", {
+              x1: p1.x, y1: p1.y,
+              x2: p2.x, y2: p2.y,
+              stroke: "rgba(255,255,255,0.2)",
+              "stroke-width": "3",
+              "stroke-dasharray": "6 4",
+              "stroke-linecap": "round"
+            });
+            pathOverlay.appendChild(arrow);
+          }
+        }
+      }
+    }
+
+    function initGamePlayers(count) {
+      activePlayers = [];
+      for (let i = 0; i < count; i++) {
+        const animal = animalOptions[i];
+        activePlayers.push({
+          id: i,
+          index: i,
+          name: animal.label,
+          label: animal.label,
+          icon: animal.icon,
+          color: animal.color,
+          pos: 1,
+          roll: 0,
+        });
+      }
+      updateAllPlayerPositions();
+      renderScoreboard();
+    }
+
+    function renderScoreboard() {
+      if (!scoreboardList) return;
+      // 3-4 pemain dibuat 2 kolom supaya papan posisi tidak makan tinggi layar
+      scoreboardList.classList.toggle('two-col', activePlayers.length > 2);
+      scoreboardList.innerHTML = activePlayers
+        .map((player, index) => {
+          const isActive = index === turnIndex;
+          return `
+              <div class="player-score${isActive ? " active-player" : ""}" style="border-color: ${player.color}33;">
+                  <div class="player-badge">
+                      <img src="${player.icon}" alt="${player.label}" />
+                      <span>${player.label}</span>
+                      ${isActive ? '<span class="player-status">Sedang giliran</span>' : ""}
+                  </div>
+                  <span>Pos ${player.pos}</span>
+              </div>
+          `;
+        })
+        .join("");
+      if (typeof fitBoard === 'function') fitBoard();
+    }
+
+    function updateAllPlayerPositions() {
+      activePlayers.forEach(function (p) {
+        const tokenDiv = document.getElementById("p" + p.id);
+        if (tokenDiv) {
+          tokenDiv.innerHTML = `<img src="${p.icon}" alt="${p.label}" style="width:100%;height:100%;display:block;object-fit:contain;" draggable="false" />`;
+        }
+        moveTokenVisual(p.id, p.pos, false);
+      });
+    }
+
+    function moveTokenVisual(playerId, cellNum, animate = true) {
+      const token = document.getElementById(`p${playerId}`);
+      const targetCell = document.getElementById(`cell-${cellNum}`);
+      if (!targetCell || !token) return;
+
+      // Ukuran & posisi pion dihitung dari ukuran petak, bukan angka px tetap,
+      // supaya tetap pas walau papannya menyusut di layar kecil / pendek.
+      const cw = targetCell.offsetWidth;
+      const ch = targetCell.offsetHeight;
+      const size = Math.max(16, Math.round(Math.min(cw, ch) * 0.42));
+      token.style.width = `${size}px`;
+      token.style.height = `${size}px`;
+
+      // Empat pion disusun 2x2 di dalam petak, masing-masing ketengah di kuadrannya
+      const col = playerId % 2;
+      const row = Math.floor(playerId / 2);
+      const left = targetCell.offsetLeft + (cw / 2) * col + (cw / 2 - size) / 2;
+      const top = targetCell.offsetTop + (ch / 2) * row + (ch / 2 - size) / 2;
+
+      if (!animate) token.style.transition = "none";
+      else token.style.transition = "top 0.4s ease-out, left 0.4s ease-out";
+
+      token.style.left = `${Math.round(left)}px`;
+      token.style.top = `${Math.round(top)}px`;
+    }
+
+    /* =========================================================
+       PENYESUAIAN UKURAN PAPAN
+       Tinggi papan = tinggi layar dikurangi tinggi asli status panel
+       + kontrol. Diukur langsung, jadi otomatis benar untuk 2 maupun
+       4 pemain (papan posisi 4 pemain lebih tinggi).
+       ========================================================= */
+    function fitBoard() {
+      const sp = document.querySelector('.status-panel');
+      const gw = document.querySelector('.game-wrapper');
+      const bc = document.querySelector('.board-container');
+      const ctrl = document.querySelector('.controls');
+      if (!sp || !gw || !bc || !ctrl) return;
+
+      const num = function (v) { return parseFloat(v) || 0; };
+      const bodyCS = getComputedStyle(document.body);
+      const spCS = getComputedStyle(sp);
+      const gwCS = getComputedStyle(gw);
+      const bcCS = getComputedStyle(bc);
+
+      const reserve =
+        num(bodyCS.paddingTop) + num(bodyCS.paddingBottom) +
+        sp.offsetHeight + num(spCS.marginBottom) +
+        num(gwCS.paddingTop) + num(gwCS.paddingBottom) +
+        num(gwCS.borderTopWidth) + num(gwCS.borderBottomWidth) +
+        num(bcCS.marginBottom) +
+        ctrl.offsetHeight + 8;              // sedikit jarak aman
+
+      const value = Math.round(reserve) + 'px';
+      const prev = document.documentElement.style.getPropertyValue('--board-reserve');
+      if (prev === value) return false;
+
+      document.documentElement.style.setProperty('--board-reserve', value);
+      // ukuran papan berubah -> pion harus dipasang ulang, kalau tidak posisinya basi
+      if (activePlayers.length && typeof updateAllPlayerPositions === 'function') {
+        requestAnimationFrame(updateAllPlayerPositions);
+      }
+      return true;
+    }
+
+    /* Papan ikut ukuran layar, jadi posisi pion harus dihitung ulang
+       setiap kali jendela diubah ukurannya (atau HP diputar). */
+    let resizeTimer = null;
+    function refitAndReposition() {
+      fitBoard();
+      // ukur sekali lagi: lebar papan berubah bisa membuat kontrol ikut berubah tinggi
+      requestAnimationFrame(function () {
+        fitBoard();
+        if (typeof updateAllPlayerPositions === 'function' && activePlayers.length) {
+          updateAllPlayerPositions();
+        }
+        renderWindingPath();
+      });
+    }
+
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(refitAndReposition, 120);
+    });
+    window.addEventListener('orientationchange', function () {
+      setTimeout(refitAndReposition, 250);
+    });
+    window.addEventListener('load', refitAndReposition);
+
+    function handlePlayAgainGame() {
+      closeWinModal();
+      resetGame();
+    }
+
+    function closeWinModal() {
+      hideModal("winModal");
+    }
+
+    function goToHome() {
+      document.body.classList.remove("fadein");
+      setTimeout(function () {
+        window.location.href = "index.html";
+      }, 320);
+    }
+
+    function showKelebihanPopup() {
+      const popup = $("popupKelebihanModal");
+      if (popup) popup.style.display = "flex";
+    }
+
+    function closeKelebihanPopup() {
+      const popup = $("popupKelebihanModal");
+      if (popup) popup.style.display = "none";
+    }
+
+    function updateCurrentPlayerDisplay() {
+      if (!nameLabel) return;
+      const player = activePlayers[turnIndex];
+      if (!player) {
+        nameLabel.innerHTML = "---";
+        return;
+      }
+      nameLabel.innerHTML = `<img src="${player.icon}" alt="${player.label}" style="width:22px;vertical-align:middle;margin-right:6px;">${player.label}`;
+      nameLabel.style.color = player.color;
+    }
+
+    function updateDiceStatus(text) {
+      if (diceStatus) diceStatus.innerText = text;
+    }
+
+    function closeWelcome() {
+      hideModal("welcomeModal");
+      showModal("modeModal");
+    }
+
+    function selectMode(count) {
+      hideModal("modeModal");
+      initGamePlayers(count);
+      orderSelectionIndex = 0;
+      startOrderResult.innerText = "Dadu siap digulirkan...";
+      renderStartOrder();
+      showModal("startOrderModal");
+    }
+
+    function prepareStartOrder() {
+      orderSelectionIndex = 0;
+      activePlayers.forEach((p) => (p.roll = 0));
+      renderStartOrder();
+      showModal("startOrderModal");
+    }
+
+    function renderStartOrder() {
+      startOrderList.innerHTML = activePlayers
+        .map((player, index) => {
+          const isActive = index === orderSelectionIndex;
+          return `
+              <li class="${isActive ? "active" : ""}">
+                <span><img src="${player.icon}" alt="${player.label}" />${player.label}</span>
+                <strong>${player.roll > 0 ? player.roll : "-"}</strong>
+              </li>
+          `;
+        })
+        .join("");
+      if (orderSelectionIndex < activePlayers.length) {
+        const player = activePlayers[orderSelectionIndex];
+        startOrderText.innerText = `Giliran ${player.label} memutar dadu.`;
+        $("startPlayerChip").innerHTML =
+          `<img src="${player.icon}" alt="${player.label}" /> ${player.label}`;
+      } else {
+        startOrderText.innerText =
+          "Semua pemain sudah memutar. Urutan akan ditentukan.";
+        $("startPlayerChip").innerText = "Menentukan urutan...";
+      }
+    }
+
+    function rollStartOrderDice() {
+      if (
+        orderSelectionIndex >= activePlayers.length ||
+        isStartOrderRolling
+      ) {
+        return;
+      }
+      isStartOrderRolling = true;
+      startOrderDiceBtn.disabled = true;
+      startOrderDiceBtn.classList.add("rolling");
+      const startDiceElement = $("startDiceFace");
+      const diceInterval = animateDiceFace(startDiceElement, 900);
+      startOrderResult.innerText = "Dadu sedang berputar...";
+      const player = activePlayers[orderSelectionIndex];
+      startOrderText.innerText = `Giliran ${player.label} memutar dadu...`;
+      setTimeout(() => {
+        const roll = Math.floor(Math.random() * 6) + 1;
+        stopDiceAnimation(startDiceElement, diceInterval, roll);
+        player.roll = roll;
+        orderSelectionIndex += 1;
+        renderStartOrder();
+        startOrderResult.innerText = `Hasil ${player.label}: ${roll}`;
+        startOrderDiceBtn.disabled = false;
+        startOrderDiceBtn.classList.remove("rolling");
+        isStartOrderRolling = false;
+        if (orderSelectionIndex >= activePlayers.length) {
+          setTimeout(finalizeStartOrder, 1000);
+        }
+      }, 900);
+    }
+
+    function finalizeStartOrder() {
+      activePlayers.sort((a, b) => b.roll - a.roll || a.index - b.index);
+      turnIndex = 0;
+      hideModal("startOrderModal");
+      gameActive = true;
+      startTimer();
+      updateCurrentPlayerDisplay();
+      updateDiceStatus(
+        `Giliran ${activePlayers[turnIndex].label}. Putar dadu untuk tantangan.`,
+      );
+      renderScoreboard();
+    }
+
+    function startTimer() {
+      startTime = Date.now();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
+    }
+
+    function updateTimer() {
+      if (!startTime) return;
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      timerDisplay.innerText = formatTime(elapsed);
+      if (elapsed >= maxGameSeconds) {
+        clearInterval(timerInterval);
+        handleTimeUp();
+      }
+    }
+
+    function handleTimeUp() {
+      gameActive = false;
+      const finalOrder = activePlayers
+        .slice()
+        .sort((a, b) => b.pos - a.pos || a.index - b.index);
+      showWinModal(finalOrder[0], true, finalOrder);
+    }
+
+    function showWinModal(player, timeUp = false, finalOrder = null) {
+      const winnerName = player ? player.label : "Pemain";
+      winText.innerText = timeUp
+        ? `Waktu habis! ${winnerName} paling dekat ke akhir.`
+        : `${winnerName} MENANG!`;
+      winEmoji.innerHTML = player
+        ? `<img src="${player.icon}" alt="${player.label}" />`
+        : "";
+
+      const ranked = (
+        finalOrder ||
+        activePlayers
+          .slice()
+          .sort((a, b) => b.pos - a.pos || a.index - b.index)
+      ).slice(0, 4);
+
+      // Render podium stage (top 3)
+      const podiumStage = document.getElementById("podiumStage");
+      if (podiumStage && ranked.length >= 2) {
+        const medals = ["🥇", "🥈", "🥉"];
+        const heights = [120, 90, 70];
+        const colors = ["#f9a825", "#bdbdbd", "#cd7f32"];
+
+        let podiumHTML = '<div class="podium-display">';
+        // Show in order: 2nd, 1st, 3rd for visual podium
+        const order = ranked.length >= 3 ? [1, 0, 2] : [1, 0];
+        order.forEach(idx => {
+          const p = ranked[idx];
+          const rank = idx + 1;
+          podiumHTML += `
+            <div class="podium-slot">
+              <div class="podium-player">
+                <img src="${p.icon}" alt="${p.label}" />
+                <span class="podium-name">${p.label}</span>
+                <span class="podium-medal">${medals[idx] || ""}</span>
+              </div>
+              <div class="podium-block" style="height:${heights[idx]}px; background:${colors[idx]};">
+                <span class="podium-rank">${rank}</span>
+              </div>
+            </div>
+          `;
+        });
+        podiumHTML += '</div>';
+        podiumStage.innerHTML = podiumHTML;
+      }
+
+      // Also show full list below
+      podiumList.innerHTML = ranked
+        .map(
+          (p, index) =>
+            `<li>${index + 1}. ${p.label} <span>Pos ${p.pos}</span></li>`,
+        )
+        .join("");
+      showModal("winModal");
+    }
+
+    function rollDice() {
+      if (!gameActive || isMoving || activePlayers.length === 0) return;
+      const player = activePlayers[turnIndex];
+      isMoving = true;
+      diceBtn.classList.add("shaking");
+      diceBtn.classList.add("rolling");
+      const diceValue = diceBtn.querySelector(".dice-value");
+      const diceInterval = animateDiceFace(diceValue, 700);
+      updateDiceStatus(`${player.label} sedang memutar dadu...`);
+      setTimeout(() => {
+        currentRoll = Math.floor(Math.random() * 6) + 1;
+        diceBtn.classList.remove("shaking");
+        diceBtn.classList.remove("rolling");
+        stopDiceAnimation(diceValue, diceInterval, currentRoll);
+        updateDiceStatus(
+          `TOTAL dadu: ${currentRoll}. Jawab soal untuk maju.`,
+        );
+        showMathQuiz();
+      }, 700);
+    }
+
+    function showMathQuiz() {
+      const player = activePlayers[turnIndex];
+      currentPlayerForQuiz = player;
+      quizIcon.innerHTML = `<img src="${player.icon}" alt="${player.label}" style="width:38px;height:38px;vertical-align:middle;">`;
+      quizQuestionEl.innerText = getQuestionByPosition(player.pos);
+      quizInput.value = "";
+      errorMsg.innerText = "";
+      showModal("quizModal");
+      quizInput.focus();
+    }
+
+    function getQuestionByPosition(position) {
+      // Determine difficulty range based on position
+      let startIdx, endIdx;
+      if (position <= 12) {
+        // Mudah: indices 0-16
+        startIdx = 0; endIdx = 17;
+      } else if (position <= 24) {
+        // Sedang: indices 17-33
+        startIdx = 17; endIdx = 34;
+      } else {
+        // Sulit: indices 34-49
+        startIdx = 34; endIdx = 50;
+      }
+
+      // Find unused questions in range
+      let available = [];
+      for (let i = startIdx; i < endIdx; i++) {
+        if (!usedQuestionIndices.includes(i)) available.push(i);
+      }
+
+      // If all used in range, reset that range
+      if (available.length === 0) {
+        usedQuestionIndices = usedQuestionIndices.filter(i => i < startIdx || i >= endIdx);
+        for (let i = startIdx; i < endIdx; i++) available.push(i);
+      }
+
+      const pickIdx = available[Math.floor(Math.random() * available.length)];
+      usedQuestionIndices.push(pickIdx);
+      const question = questionBank[pickIdx];
+      correctAnswer = question.a;
+      return question.q;
+    }
+
+    function checkAnswer() {
+      const answer = parseInt(quizInput.value, 10);
+      if (Number.isNaN(answer)) {
+        errorMsg.innerText = "Isi jawaban dengan angka terlebih dahulu.";
+        return;
+      }
+      hideModal("quizModal");
+      const success = answer === correctAnswer;
+      handleQuizResult(success);
+    }
+
+    async function animatePlayerMovement(player, targetPosition) {
+      const step = targetPosition > player.pos ? 1 : -1;
+      while (player.pos !== targetPosition) {
+        player.pos += step;
+        moveTokenVisual(player.id, player.pos, true);
+        await sleep(180);
+      }
+    }
+
+    let feedbackResolve = null;
+
+    function showFeedback(success, message) {
+      if (!feedbackModal) return;
+      const feedbackBox = document.getElementById("feedbackBox");
+      const feedbackBadge = document.getElementById("feedbackBadge");
+      const feedbackBtn = document.getElementById("feedbackBtn");
+      const feedbackSnake = feedbackBox.querySelector(".feedback-snake");
+
+      if (feedbackBadge) {
+        feedbackBadge.innerText = success ? "BENAR!" : "SALAH!";
+        feedbackBadge.className = "feedback-badge " + (success ? "feedback-correct" : "feedback-wrong");
+      }
+      resultFeedbackText.innerText = message;
+      if (feedbackBtn) {
+        feedbackBtn.innerText = success ? "Lanjutkan" : "Coba Lagi";
+        feedbackBtn.className = "feedback-btn " + (success ? "feedback-btn-correct" : "feedback-btn-wrong");
+      }
+      if (feedbackBox) {
+        feedbackBox.className = "feedback-card " + (success ? "feedback-card-correct" : "feedback-card-wrong");
+      }
+      showModal("successModal");
+
+      return new Promise(resolve => { feedbackResolve = resolve; });
+    }
+
+    function closeFeedback() {
+      hideModal("successModal");
+      if (feedbackResolve) { feedbackResolve(); feedbackResolve = null; }
+    }
+
+    async function handleQuizResult(success) {
+      const player = currentPlayerForQuiz;
+      if (!player) return;
+      const moveAmount = success ? currentRoll : 0;
+      const targetPosition = success
+        ? Math.min(endCell, player.pos + moveAmount)
+        : player.pos;
+      if (success) {
+        await animatePlayerMovement(player, targetPosition);
+        const shortcut = shortcuts[player.pos];
+        if (shortcut) {
+          await sleep(300);
+          player.pos = shortcut.dest;
+          moveTokenVisual(player.id, player.pos, true);
+        }
+      }
+      renderScoreboard();
+      if (player.pos === endCell) {
+        gameActive = false;
+        clearInterval(timerInterval);
+        showWinModal(player, false);
+        return;
+      }
+      const message = success
+        ? `Hebat! ${player.label} maju ${moveAmount} langkah!`
+        : `Jawaban salah. ${player.label} tetap di tempat. Jawaban yang benar: ${correctAnswer}`;
+      await showFeedback(success, message);
+      nextTurn();
+    }
+
+    function nextTurn() {
+      turnIndex = (turnIndex + 1) % activePlayers.length;
+      updateCurrentPlayerDisplay();
+      updateDiceStatus(
+        `Giliran ${activePlayers[turnIndex].label}. Putar dadu untuk tantangan.`,
+      );
+      isMoving = false;
+      const diceValue = diceBtn.querySelector(".dice-value");
+      setDiceFace(diceValue, 1);
+    }
+
+    function resetGame() {
+      gameActive = false;
+      if (timerInterval) clearInterval(timerInterval);
+      activePlayers = [];
+      turnIndex = 0;
+      currentRoll = 0;
+      currentPlayerForQuiz = null;
+      correctAnswer = 0;
+      isMoving = false;
+      orderSelectionIndex = 0;
+      usedQuestionIndices = [];
+      hideModal("modeModal");
+      hideModal("startOrderModal");
+      hideModal("quizModal");
+      hideModal("winModal");
+      hideModal("successModal");
+      hideModal("popupKelebihanModal");
+      initBoard();
+      updateCurrentPlayerDisplay();
+      renderScoreboard();
+      updateDiceStatus("Klik dadu untuk pilih tantangan.");
+      timerDisplay.innerText = "00:00";
+      showModal("welcomeModal");
+    }
+
+    quizInput.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        checkAnswer();
+      }
+    });
+
+    initBoard();
+
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(function () {
+        document.body.classList.add("fadein");
+      }, 20);
+
+      showModal("welcomeModal");
+
+      var audio = document.getElementById("backgroundAudio");
+      var muteBtn = document.getElementById("muteToggleBtn");
+      var iconMain = document.getElementById("icon-mute-toggle");
+      var iconPolygonMain = document.getElementById(
+        "icon-mute-toggle-polygon",
+      );
+      var iconLineMain = document.getElementById("icon-mute-toggle-line");
+      var audioDropdown = document.getElementById("audioDropdown");
+      var audioVolumeSlider = document.getElementById("audioVolumeSlider");
+      var audioMuteMiniBtn = document.getElementById("audioMuteMiniBtn");
+      var audioMuteMiniIcon = document.getElementById("audioMuteMiniIcon");
+      var audioMuteMiniPoly = document.getElementById("audioMuteMiniPoly");
+      var audioMuteMiniLine = document.getElementById("audioMuteMiniLine");
+
+      var LS_MUTED = "mtkgame-audio-muted";
+      var LS_VOLUME = "mtkgame-audio-volume";
+
+      var savedAudioState = localStorage.getItem(LS_MUTED);
+      var savedAudioVolume = localStorage.getItem(LS_VOLUME);
+
+      function setMuteIcon(isMuted, svgElem, polyElem, lineElem) {
+        if (!svgElem || !polyElem || !lineElem) return;
+        if (isMuted) {
+          polyElem.setAttribute(
+            "points",
+            "9 9 13 9 17 5 17 19 13 15 9 15 9 9 9 9",
+          );
+          lineElem.setAttribute("x1", "1");
+          lineElem.setAttribute("y1", "1");
+          lineElem.setAttribute("x2", "23");
+          lineElem.setAttribute("y2", "23");
+          svgElem.setAttribute("stroke", "#999");
+        } else {
+          polyElem.setAttribute(
+            "points",
+            "9 9 13 9 17 5 17 19 13 15 9 15 9 9",
+          );
+          lineElem.setAttribute("x1", "19");
+          lineElem.setAttribute("y1", "5");
+          lineElem.setAttribute("x2", "19");
+          lineElem.setAttribute("y2", "19");
+          svgElem.setAttribute("stroke", "#FBB904");
+        }
+      }
+
+      if (savedAudioState === "true") {
+        audio.muted = true;
+      } else {
+        audio.muted = false;
+      }
+      if (savedAudioVolume) {
+        var v = parseFloat(savedAudioVolume);
+        if (!isNaN(v)) {
+          audio.volume = v / 100;
+          audioVolumeSlider.value = Math.round(v);
+        }
+      } else {
+        audio.volume = 1;
+        audioVolumeSlider.value = 100;
+      }
+
+      function renderAudioIcons() {
+        setMuteIcon(audio.muted, iconMain, iconPolygonMain, iconLineMain);
+        setMuteIcon(
+          audio.muted,
+          audioMuteMiniIcon,
+          audioMuteMiniPoly,
+          audioMuteMiniLine,
+        );
+        if (audioMuteMiniBtn) {
+          if (audio.muted) audioMuteMiniBtn.classList.add("muted");
+          else audioMuteMiniBtn.classList.remove("muted");
+        }
+      }
+      renderAudioIcons();
+
+      function playAudioAlways() {
+        if (!audio.muted) {
+          audio
+            .play()
+            .then(function () {})
+            .catch(function () {});
+        }
+      }
+      setInterval(playAudioAlways, 2000);
+      window.addEventListener("pointerdown", playAudioAlways, {
+        once: true,
+        passive: true,
+      });
+      window.addEventListener("keydown", playAudioAlways, {
+        once: true,
+        passive: true,
+      });
+      setTimeout(playAudioAlways, 200);
+
+      let dropdownOpen = false;
+      function showDropdown() {
+        dropdownOpen = true;
+        audioDropdown.classList.add("show");
+        setTimeout(() => {
+          audioDropdown.style.pointerEvents = "auto";
+        }, 40);
+        document.body.addEventListener(
+          "mousedown",
+          closeDropdownOnBody,
+          true,
+        );
+        document.body.addEventListener(
+          "touchstart",
+          closeDropdownOnBody,
+          true,
+        );
+      }
+      function hideDropdown() {
+        dropdownOpen = false;
+        audioDropdown.classList.remove("show");
+        audioDropdown.style.pointerEvents = "none";
+        setTimeout(() => {
+          document.body.removeEventListener(
+            "mousedown",
+            closeDropdownOnBody,
+            true,
+          );
+          document.body.removeEventListener(
+            "touchstart",
+            closeDropdownOnBody,
+            true,
+          );
+        }, 300);
+      }
+      let closeDropdownOnBody = function (e) {
+        if (!dropdownOpen) return;
+        let t = e.target;
+        if (!muteBtn.contains(t) && !audioDropdown.contains(t)) {
+          hideDropdown();
+        }
+      };
+
+      muteBtn.addEventListener("click", function (evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        if (dropdownOpen) {
+          hideDropdown();
+        } else {
+          showDropdown();
+        }
+      });
+
+      if (audioMuteMiniBtn) {
+        audioMuteMiniBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          audio.muted = !audio.muted;
+          if (audio.muted) {
+            localStorage.setItem(LS_MUTED, "true");
+            audio.pause();
+          } else {
+            localStorage.setItem(LS_MUTED, "false");
+            playAudioAlways();
+          }
+          renderAudioIcons();
+        });
+      }
+
+      audioVolumeSlider.addEventListener("input", function () {
+        let val = Number(audioVolumeSlider.value);
+        let v = isNaN(val) ? 1 : Math.max(0, Math.min(val, 100));
+        audio.volume = v / 100;
+        localStorage.setItem(LS_VOLUME, String(v));
+        if (v === 0) {
+          audio.muted = true;
+          localStorage.setItem(LS_MUTED, "true");
+          audio.pause();
+        } else {
+          if (audio.muted) {
+            audio.muted = false;
+            localStorage.setItem(LS_MUTED, "false");
+            playAudioAlways();
+          }
+        }
+        renderAudioIcons();
+      });
+
+      audio.addEventListener("volumechange", function () {
+        let volumePct = Math.round(audio.volume * 100);
+        if (Number(audioVolumeSlider.value) !== volumePct) {
+          audioVolumeSlider.value = volumePct;
+        }
+        renderAudioIcons();
+      });
+
+      document.addEventListener("keydown", function (ev) {
+        if (dropdownOpen && ev.key === "Escape") hideDropdown();
+        if (
+          $("popupKelebihanModal").style.display === "flex" &&
+          ev.key === "Escape"
+        ) {
+          closeKelebihanPopup();
+        }
+        if ($("winModal").style.display === "flex" && ev.key === "Escape") {
+          closeWinModal();
+        }
+      });
+      window.addEventListener("resize", function () {
+        if (dropdownOpen) hideDropdown();
+      });
+
+      document
+        .querySelector(".back-btn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.body.classList.remove("fadein");
+          setTimeout(function () {
+            window.location.href = "index.html";
+          }, 510);
+        });
+    });
+  </script>
+</body>
+</html>

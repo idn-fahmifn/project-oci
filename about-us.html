@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Me — Ochi</title>
+  <meta name="description" content="Tentang Rossy Fadhilah (Ochi) — kreator media pembelajaran matematika interaktif.">
+  <link rel="icon" href="asset/profile-abous-us-2.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/about-us.css">
+</head>
+<body>
+  <!-- Back Button -->
+  <a href="index.html" class="back-home-btn" aria-label="Kembali ke Home">
+    <svg viewBox="0 0 24 24"><path d="M3 9.5L12 2l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.5z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="var(--color-forest)" stroke-width="2"/></svg>
+  </a>
+
+  <main class="about-shell">
+    <!-- Profile Hero -->
+    <section class="profile-hero">
+      <div class="profile-image-wrapper">
+        <img class="profile-image" src="asset/profile about us.png" alt="Rossy Fadhilah — Ochi">
+      </div>
+      <div class="bio-card">
+        <p>
+          Halooo! Kenalan dulu yuk! Aku <strong>Rossy Fadhilah</strong>, tapi temen-temen biasanya manggil aku <strong>Ochi</strong>. Aku mahasiswa PGSD di IKIP Siliwangi, Cimahi — tempat aku belajar gimana caranya jadi guru yang asik dan nggak bikin ngantuk di kelas!
+        </p>
+        <p>
+          Sejak 2023, aku udah mulai ngajar anak-anak SD dan jujur... itu salah satu hal paling seru yang pernah aku lakuin! Dari situ, aku makin semangat bikin cara belajar yang fun, salah satunya lewat website ini — ada video, ada game ular tangga, pokoknya belajar matematika jadi nggak membosankan!
+        </p>
+        <p>
+          Aku percaya banget kalau belajar itu nggak harus serius terus. Kadang yang paling nempel itu justru yang paling seru. Jadi, semoga media ini bisa bantu kalian belajar sambil senyum-senyum, ya!
+        </p>
+      </div>
+    </section>
+
+    <!-- MY LITTLE BELIEF Quote -->
+    <section class="belief-section">
+      <div class="belief-card">
+        <div class="belief-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+        </div>
+        <h3 class="belief-title">MY LITTLE BELIEF</h3>
+        <blockquote class="belief-quote">
+          "Belajar nggak harus selalu tentang seberapa cepat kita memahami sesuatu, tapi tentang bagaimana kita menikmati proses untuk terus mencoba."
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- Interests Section -->
+    <section class="interests-section">
+      <h2 class="interests-title">Minat dan Hobi</h2>
+
+      <div class="interests-desc">
+        Selain suka mengajar dan membuat media belajar yang seru, aku juga punya beberapa hobi yang bikin hari-hariku lebih berwarna. Aku suka menyanyi karena rasanya menyenangkan bisa bernyanyi sambil mengekspresikan diri. Aku juga suka belajar hal-hal baru, apalagi yang bisa bikin aku jadi guru yang lebih baik untuk kalian. Dan tentu saja… aku suka jajan dan bikin konten kreatif!
+      </div>
+
+      <div class="interests-tagline">
+        Semoga hobi-hobi ini bikin kalian lebih kenal sama aku ya!
+      </div>
+
+      <div class="interest-grid">
+        <div class="interest-card">
+          <img src="asset/intro 1.png" alt="Menyanyi">
+          <span class="interest-label">Music &amp; Voice</span>
+        </div>
+        <div class="interest-card">
+          <img src="asset/intro 2.png" alt="Mengajar &amp; Membaca">
+          <span class="interest-label">Teaching &amp; Books</span>
+        </div>
+        <div class="interest-card">
+          <img src="asset/intro 3.png" alt="Jajan &amp; Kuliner">
+          <span class="interest-label">Food &amp; Fun</span>
+        </div>
+        <div class="interest-card">
+          <img src="asset/intro 4.png" alt="Kreatif &amp; Content">
+          <span class="interest-label">Kreatif &amp; Content</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('ready');
+
+    // Back button page transition
+    var backBtn = document.querySelector('.back-home-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', function(e) {
+        if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          document.body.style.opacity = '0';
+          setTimeout(function() { window.location.href = backBtn.getAttribute('href'); }, 400);
+        }
+      });
+    }
+  });
+  </script>
+</body>
+</html>

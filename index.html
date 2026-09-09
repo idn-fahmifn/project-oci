@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Ular Tangga Matematika</title>
+  <meta name="description" content="Game Ular Tangga Operasi Hitung Campuran — media pembelajaran interaktif untuk siswa SD kelas III.">
+  <link rel="icon" href="asset/logo.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="entering">
+
+  <!-- Falling Leaves -->
+  <div class="falling-leaves" id="leavesContainer"></div>
+
+  <!-- Transition Overlay -->
+  <div class="transition-overlay" id="transitionOverlay"></div>
+
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <div class="top-left">
+      <img src="asset/logo.png" alt="Logo" class="logo-mark">
+      <button class="audio-btn" id="muteToggleBtn" aria-label="Mute / Unmute Audio" title="Mute / Unmute">
+        <svg id="audioIcon" viewBox="0 0 24 24">
+          <polygon id="audioIconPoly" points="9 9 13 9 17 5 17 19 13 15 9 15 9 9"/>
+          <line id="audioIconLine" x1="19" y1="5" x2="19" y2="19"/>
+        </svg>
+      </button>
+      <!-- Volume Panel -->
+      <div class="audio-panel" id="audioPanel">
+        <button class="vol-mute-mini" id="volMuteMini" aria-label="Mute Mini">
+          <svg class="vol-icon" id="volMiniIcon" viewBox="0 0 24 24">
+            <polygon id="volMiniPoly" points="9 9 13 9 17 5 17 19 13 15 9 15 9 9"/>
+            <line id="volMiniLine" x1="19" y1="5" x2="19" y2="19"/>
+          </svg>
+        </button>
+        <span class="vol-label">0</span>
+        <input type="range" min="0" max="100" value="100" class="volume-slider" id="volumeSlider" aria-label="Volume">
+        <span class="vol-label">100</span>
+      </div>
+    </div>
+    <div class="top-right">
+      <a href="about-us.html" class="info-btn" id="aboutMeBtn" aria-label="About Me" title="Tentang Pembuat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-forest);">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </a>
+      <button class="info-btn" id="infoBtn" aria-label="Informasi" title="Informasi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-forest);">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Background Audio -->
+  <audio id="bgAudio" src="audio.mp3" loop></audio>
+
+  <!-- Hero Section -->
+  <main class="hero">
+    <img src="asset/template matematika.png" alt="Ular Tangga Matematika" class="hero-image" draggable="false">
+
+    <nav class="menu-stack">
+      <a class="btn-start" id="startGameBtn" href="ulartangga.html">
+        <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        START GAME
+      </a>
+      <div class="menu-row">
+        <a class="btn" id="materiBtn" href="materi-page.html">Materi</a>
+        <button class="btn" id="caraMainBtn" type="button">Cara Bermain</button>
+      </div>
+      <button class="btn btn-tujuan" id="tujuanBtn" type="button">Tujuan Pembelajaran</button>
+    </nav>
+  </main>
+
+  <!-- Tujuan Pembelajaran Modal -->
+  <div class="tujuan-modal-overlay" id="tujuanModal">
+    <div class="tujuan-modal">
+      <button class="modal-close-btn" id="closeTujuanModal" aria-label="Tutup">
+        <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+      <!-- Snake Mascot -->
+      <div class="snake-mascot tujuan-mascot">
+        <svg viewBox="0 0 80 80" class="snake-svg">
+          <ellipse cx="40" cy="28" rx="22" ry="18" fill="#4caf50"/>
+          <ellipse cx="40" cy="28" rx="18" ry="15" fill="#66bb6a"/>
+          <circle cx="33" cy="24" r="5" fill="white"/><circle cx="47" cy="24" r="5" fill="white"/>
+          <circle cx="34" cy="24" r="2.5" fill="#1a1a1a"/><circle cx="48" cy="24" r="2.5" fill="#1a1a1a"/>
+          <ellipse cx="40" cy="33" rx="6" ry="2.5" fill="#388e3c"/>
+          <path d="M36 33 Q40 38 44 33" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M25 42 Q20 55 30 62 Q40 68 50 62 Q60 55 55 42" fill="#4caf50" stroke="none"/>
+          <path d="M28 44 Q23 55 32 60 Q40 64 48 60 Q57 55 52 44" fill="#66bb6a" stroke="none"/>
+          <circle cx="36" cy="52" r="2" fill="#fff3e0" opacity="0.6"/>
+          <circle cx="44" cy="50" r="1.8" fill="#fff3e0" opacity="0.5"/>
+          <circle cx="40" cy="56" r="1.5" fill="#fff3e0" opacity="0.4"/>
+        </svg>
+      </div>
+      <h3>Tujuan Pembelajaran</h3>
+      <p class="tujuan-intro">Setelah bermain game ular tangga ini, diharapkan siswa dapat:</p>
+      <ol class="tujuan-list">
+        <li>Memahami konsep perkalian dan pembagian bilangan cacah</li>
+        <li>Menyelesaikan soal perkalian dengan teknik menyimpan</li>
+        <li>Menyelesaikan soal pembagian dengan teknik porogapit</li>
+        <li>Menerapkan operasi hitung campuran (perkalian &amp; pembagian) dalam soal cerita</li>
+        <li>Meningkatkan kecepatan dan ketepatan berhitung melalui permainan yang menyenangkan</li>
+      </ol>
+      <div class="tujuan-tagline">Siap bermain dan menaklukkan ular tangga? 🐍🎲</div>
+      <button class="btn-close-modal" id="closeTujuanBtn">Siap!</button>
+    </div>
+  </div>
+
+  <!-- Info Modal — Story-style Introduction -->
+  <div class="info-modal-overlay" id="infoModal">
+    <div class="info-modal">
+      <button class="modal-close-btn" id="closeInfoX" aria-label="Tutup">
+        <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+
+      <!-- Story Header -->
+      <div class="info-story-header">
+        <div class="snake-mascot info-mascot">
+          <svg viewBox="0 0 80 80" class="snake-svg">
+            <ellipse cx="40" cy="28" rx="22" ry="18" fill="#4caf50"/>
+            <ellipse cx="40" cy="28" rx="18" ry="15" fill="#66bb6a"/>
+            <circle cx="33" cy="24" r="5" fill="white"/><circle cx="47" cy="24" r="5" fill="white"/>
+            <circle cx="34" cy="24" r="2.5" fill="#1a1a1a"/><circle cx="48" cy="24" r="2.5" fill="#1a1a1a"/>
+            <ellipse cx="40" cy="33" rx="6" ry="2.5" fill="#388e3c"/>
+            <path d="M36 33 Q40 38 44 33" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M25 42 Q20 55 30 62 Q40 68 50 62 Q60 55 55 42" fill="#4caf50" stroke="none"/>
+            <path d="M28 44 Q23 55 32 60 Q40 64 48 60 Q57 55 52 44" fill="#66bb6a" stroke="none"/>
+            <circle cx="36" cy="52" r="2" fill="#fff3e0" opacity="0.6"/>
+            <circle cx="44" cy="50" r="1.8" fill="#fff3e0" opacity="0.5"/>
+            <circle cx="40" cy="56" r="1.5" fill="#fff3e0" opacity="0.4"/>
+          </svg>
+        </div>
+        <h3 class="info-story-title">Halo, Petualang Matematika!</h3>
+        <p class="info-story-intro">Selamat datang di dunia Ular Tangga Matematika! Yuk, ikuti langkah-langkah ini supaya petualanganmu makin seru!</p>
+      </div>
+
+      <!-- Story Steps on Wooden Boards -->
+      <div class="info-steps">
+        <div class="info-step-item">
+          <div class="info-step-board">
+            <span class="info-step-num">1</span>
+            <span class="info-step-text">Buka <strong>Materi</strong> dan tonton video penjelasan perkalian &amp; pembagian.</span>
+          </div>
+        </div>
+
+        <div class="info-step-item">
+          <div class="info-step-board">
+            <span class="info-step-num">2</span>
+            <span class="info-step-text">Baca <strong>Cara Bermain</strong> supaya kamu tahu aturan permainannya.</span>
+          </div>
+        </div>
+
+        <div class="info-step-item">
+          <div class="info-step-board">
+            <span class="info-step-num">3</span>
+            <span class="info-step-text">Klik <strong>Start Game</strong>, pilih pemain, lempar dadu, lalu jawab soalnya!</span>
+          </div>
+        </div>
+
+        <div class="info-step-item">
+          <div class="info-step-board">
+            <span class="info-step-num">4</span>
+            <span class="info-step-text">Jawaban <strong>benar</strong> bikin kamu maju. Sampai <strong>FINISH</strong> duluan, kamu menang!</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story Footer -->
+      <div class="info-story-footer">
+        <p class="info-story-tagline">Siap berpetualang? Ayo mulai belajar sambil bermain!</p>
+        <button class="btn-close-modal" id="closeInfoModal">Ayo Mulai!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cara Bermain Modal (papan kayu, konten inline supaya bisa di-scroll) -->
+  <div class="rules-modal-overlay" id="rulesModal">
+    <div class="rules-modal">
+      <button class="modal-close-btn" id="closeRulesModal" aria-label="Tutup">
+        <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+
+      <div class="rules-scroll" id="rulesScroll" tabindex="0">
+        <div class="rules-container">
+          <header class="rules-header">
+            <h1>Cara Bermain</h1>
+            <p>Game Ular Tangga Matematika</p>
+            <div class="rules-divider"></div>
+          </header>
+
+          <!-- Latar Belakang -->
+          <section class="rules-section">
+            <div class="rules-section-label">
+              <svg class="label-icon" viewBox="0 0 24 24"><path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
+              Latar Belakang
+            </div>
+            <div class="rules-card">
+              Matematika merupakan kemampuan dasar yang penting bagi siswa SD, namun pada materi operasi hitung campuran kelas III, banyak siswa masih mengalami kesulitan terutama saat menyelesaikan soal cerita dan menentukan urutan operasi yang tepat. Pembelajaran yang monoton juga sering membuat siswa cepat bosan sehingga pemahaman menjadi kurang optimal. Untuk itu, dikembangkan media pembelajaran interaktif berupa game ular tangga berbasis web yang dipadukan dengan video penjelasan materi, sehingga siswa dapat belajar sambil bermain, lebih termotivasi, serta lebih mudah memahami langkah-langkah penyelesaian soal.
+            </div>
+          </section>
+
+          <!-- Cara Bermain -->
+          <section class="rules-section">
+            <div class="rules-section-label">
+              <svg class="label-icon" viewBox="0 0 24 24"><path d="M14.25 6.087c0-.355.313-.75.75-.75h4.5c.436 0 .75.395.75.75v4.5c0 .355-.314.75-.75.75h-4.5a.75.75 0 0 1-.75-.75V6.087ZM3.75 6.087c0-.355.314-.75.75-.75h4.5c.437 0 .75.395.75.75v4.5c0 .355-.313.75-.75.75h-4.5a.75.75 0 0 1-.75-.75V6.087ZM3.75 16.587c0-.355.314-.75.75-.75h4.5c.437 0 .75.395.75.75v4.5c0 .355-.313.75-.75.75h-4.5a.75.75 0 0 1-.75-.75v-4.5ZM14.25 16.587c0-.355.313-.75.75-.75h4.5c.436 0 .75.395.75.75v4.5c0 .355-.314.75-.75.75h-4.5a.75.75 0 0 1-.75-.75v-4.5Z"/></svg>
+              Cara Bermain
+            </div>
+            <div class="rules-card">
+              <ol class="rules-steps">
+                <li>
+                  <span class="step-number">1</span>
+                  <span>Tonton video pembelajaran terlebih dahulu untuk memahami materi operasi hitung campuran.</span>
+                </li>
+                <li>
+                  <span class="step-number">2</span>
+                  <span>Siswa dibagi menjadi dua kelompok dan masing-masing memilih karakter pion yang akan digunakan.</span>
+                </li>
+                <li>
+                  <span class="step-number">3</span>
+                  <span>Kedua kelompok melempar dadu — kelompok dengan angka terbesar berhak mulai lebih dulu.</span>
+                </li>
+                <li>
+                  <span class="step-number">4</span>
+                  <span>Setiap kali pion berhenti pada petak soal, kelompok tersebut harus menjawab soal dengan cepat.</span>
+                </li>
+                <li>
+                  <span class="step-number">5</span>
+                  <span>Jika jawaban <strong>benar</strong>, pion tetap di petak tersebut. Jika <strong>salah</strong>, pion harus mundur ke posisi sebelumnya.</span>
+                </li>
+                <li>
+                  <span class="step-number">6</span>
+                  <span>Kelompok yang paling banyak menjawab benar akan lebih cepat mencapai garis finish dan menjadi <strong>pemenang</strong>!</span>
+                </li>
+              </ol>
+            </div>
+          </section>
+
+          <!-- Tip -->
+          <div class="rules-tip">
+            <span class="tip-icon">&#x1F4A1;</span>
+            <span>Media ini diharapkan membantu siswa, guru, dan orang tua dalam mendukung proses belajar operasi hitung campuran secara lebih menyenangkan dan efektif.</span>
+          </div>
+        </div>
+
+        <!-- Petunjuk scroll (sticky di dalam area scroll) -->
+        <div class="rules-scroll-hint" id="rulesScrollHint" aria-hidden="true">
+          <span class="hint-pill">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            Geser ke bawah
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       TOUR PEMBUKA — tooltip berurutan seperti alur cerita.
+       Menjelaskan tujuan pembelajaran + apa yang harus dilakukan.
+       ============================================ -->
+  <div class="tour-overlay" id="tourOverlay" role="dialog" aria-modal="true" aria-labelledby="tourTitle">
+    <!-- lubang sorot: bayangan raksasa bikin sekeliling jadi gelap -->
+    <div class="tour-spotlight" id="tourSpotlight"></div>
+
+    <div class="tour-bubble" id="tourBubble">
+      <button class="tour-skip" id="tourSkip" type="button">Lewati</button>
+
+      <div class="tour-body">
+        <div class="tour-mascot" id="tourMascot">
+          <svg viewBox="0 0 80 80" class="snake-svg">
+            <ellipse cx="40" cy="28" rx="22" ry="18" fill="#4caf50"/>
+            <ellipse cx="40" cy="28" rx="18" ry="15" fill="#66bb6a"/>
+            <circle cx="33" cy="24" r="5" fill="white"/><circle cx="47" cy="24" r="5" fill="white"/>
+            <circle cx="34" cy="24" r="2.5" fill="#1a1a1a"/><circle cx="48" cy="24" r="2.5" fill="#1a1a1a"/>
+            <ellipse cx="40" cy="33" rx="6" ry="2.5" fill="#388e3c"/>
+            <path d="M36 33 Q40 38 44 33" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M25 42 Q20 55 30 62 Q40 68 50 62 Q60 55 55 42" fill="#4caf50"/>
+            <path d="M28 44 Q23 55 32 60 Q40 64 48 60 Q57 55 52 44" fill="#66bb6a"/>
+            <circle cx="36" cy="52" r="2" fill="#fff3e0" opacity="0.6"/>
+            <circle cx="44" cy="50" r="1.8" fill="#fff3e0" opacity="0.5"/>
+            <circle cx="40" cy="56" r="1.5" fill="#fff3e0" opacity="0.4"/>
+          </svg>
+        </div>
+
+        <div class="tour-text">
+          <span class="tour-step-badge" id="tourBadge">Langkah 1</span>
+          <h3 class="tour-title" id="tourTitle"></h3>
+          <p class="tour-desc" id="tourDesc"></p>
+          <ul class="tour-list" id="tourList"></ul>
+        </div>
+      </div>
+
+      <div class="tour-footer">
+        <div class="tour-dots" id="tourDots"></div>
+        <div class="tour-nav">
+          <button class="tour-btn tour-btn-back" id="tourBack" type="button">Kembali</button>
+          <button class="tour-btn tour-btn-next" id="tourNext" type="button">Lanjut</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Copyright -->
+  <footer class="footer-copyright">
+    <span>&copy; <span id="copyrightYear"></span> Rossy Fadhilah</span>
+  </footer>
+
+  <script>
+  (function() {
+    'use strict';
+
+    /* ---- Falling Leaves ---- */
+    const leafShapes = [
+      { svg: '<svg viewBox="0 0 36 38"><path class="leafShape" d="M18,2 C16,11 3,13 2,23 C1,31 12,36 19,36 C27,36 34,30 33,20 C32,10 21,9 18,2 Z"/></svg>', cls: 'green' },
+      { svg: '<svg viewBox="0 0 36 38"><path class="leafShape" d="M18,4 C14,12 5,15 5,25 C5,32 18,36 23,31 C29,25 34,17 26,11 C23,9 20,4 18,4 Z"/></svg>', cls: 'lime' },
+      { svg: '<svg viewBox="0 0 34 38"><path class="leafShape" d="M17,3 Q4,22 17,35 Q30,22 17,3 Z"/></svg>', cls: 'gold' },
+      { svg: '<svg viewBox="0 0 36 34"><path class="leafShape" d="M18,31 Q12,23 5,20 Q1,10 8,3 Q14,3 18,9 Q22,3 28,3 Q35,10 31,20 Q24,23 18,31 Z"/></svg>', cls: 'teal' },
+      { svg: '<svg viewBox="0 0 40 38"><path class="leafShape" d="M20,2 C17,7 7,6 9,13 C3,15 7,20 13,18 C7,25 16,24 17,22 C13,33 27,32 23,22 C31,25 32,15 27,15 C34,13 31,6 25,10 C24,6 20,2 20,2 Z"/></svg>', cls: 'sage' },
+      { svg: '<svg viewBox="0 0 38 38"><path class="leafShape" d="M19 3 L22 9 L33 8 L26 16 L33 18 L26 21 L32 29 L22.5 21.5 L19 36 L15.5 21.5 L6 29 L11 21 L3 18 L10 16 L3 8 L16 9 Z"/></svg>', cls: 'amber' }
+    ];
+
+    const leavesContainer = document.getElementById('leavesContainer');
+    function rand(a, b) { return a + Math.random() * (b - a); }
+
+    function spawnLeaf() {
+      if (!leavesContainer) return;
+      const s = leafShapes[Math.floor(Math.random() * leafShapes.length)];
+      const el = document.createElement('div');
+      el.className = 'leaf ' + s.cls;
+      el.innerHTML = s.svg;
+      const x = rand(0, window.innerWidth);
+      const dur = rand(9, 16);
+      const delay = rand(0, 1.5);
+      const rotStart = rand(-180, 180);
+      el.style.left = x + 'px';
+      el.style.top = '-50px';
+      el.style.setProperty('--leaf-start-rot', rotStart + 'deg');
+      el.style.setProperty('--leaf-end-rot', (rotStart + rand(360, 720)) + 'deg');
+      el.style.setProperty('--leaf-drift', rand(-80, 80) + 'px');
+      el.style.animation = 'leaf-fall ' + dur + 's ' + delay + 's linear forwards';
+      leavesContainer.appendChild(el);
+      setTimeout(() => { if (el.parentNode) el.remove(); }, (dur + delay) * 1000);
+    }
+
+    function leavesLoop() {
+      spawnLeaf();
+      setTimeout(leavesLoop, rand(400, 1200));
+    }
+    leavesLoop();
+
+    /* ---- Page Init ---- */
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fade in
+      requestAnimationFrame(() => {
+        document.body.classList.remove('entering');
+        document.body.classList.add('ready');
+      });
+
+      // Copyright year
+      const yearEl = document.getElementById('copyrightYear');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+      // Transition overlay
+      const overlay = document.getElementById('transitionOverlay');
+
+      function navigateTo(url) {
+        if (overlay) {
+          overlay.classList.add('active');
+          setTimeout(() => { window.location.href = url; }, 500);
+        } else {
+          window.location.href = url;
+        }
+      }
+
+      // Start Game
+      document.getElementById('startGameBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        navigateTo('ulartangga.html');
+      });
+
+      // Materi
+      document.getElementById('materiBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        navigateTo('materi-page.html');
+      });
+
+      // About Me
+      document.getElementById('aboutMeBtn').addEventListener('click', function(e) {
+        if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          navigateTo('about-us.html');
+        }
+      });
+
+      /* ---- Info Modal ---- */
+      const infoBtn = document.getElementById('infoBtn');
+      const infoModal = document.getElementById('infoModal');
+      const closeInfo = document.getElementById('closeInfoModal');
+
+      var closeInfoX = document.getElementById('closeInfoX');
+
+      function openInfo() { infoModal.classList.add('open'); }
+      function closeInfoFn() { infoModal.classList.remove('open'); }
+
+      infoBtn.addEventListener('click', openInfo);
+      closeInfo.addEventListener('click', closeInfoFn);
+      closeInfoX.addEventListener('click', closeInfoFn);
+      infoModal.addEventListener('click', function(e) { if (e.target === infoModal) closeInfoFn(); });
+
+      /* ---- Cara Bermain Modal ---- */
+      const caraBtn = document.getElementById('caraMainBtn');
+      const rulesModal = document.getElementById('rulesModal');
+      const closeRules = document.getElementById('closeRulesModal');
+      const rulesScroll = document.getElementById('rulesScroll');
+      const rulesHint = document.getElementById('rulesScrollHint');
+
+      function openRules() {
+        rulesModal.classList.add('open');
+        // reset ke atas + tampilkan petunjuk scroll kalau kontennya panjang
+        rulesScroll.scrollTop = 0;
+        var scrollable = rulesScroll.scrollHeight > rulesScroll.clientHeight + 8;
+        rulesHint.classList.toggle('hidden', !scrollable);
+        // fokus supaya panah atas/bawah & PageDown langsung bisa dipakai
+        setTimeout(function() { rulesScroll.focus({ preventScroll: true }); }, 60);
+      }
+
+      function closeRulesFn() { rulesModal.classList.remove('open'); }
+
+      // Petunjuk hilang begitu mulai di-scroll
+      rulesScroll.addEventListener('scroll', function() {
+        rulesHint.classList.toggle('hidden', rulesScroll.scrollTop > 12);
+      }, { passive: true });
+
+      caraBtn.addEventListener('click', openRules);
+      closeRules.addEventListener('click', closeRulesFn);
+      rulesModal.addEventListener('click', function(e) { if (e.target === rulesModal) closeRulesFn(); });
+
+      /* ---- Tujuan Pembelajaran Modal ---- */
+      const tujuanBtn = document.getElementById('tujuanBtn');
+      const tujuanModal = document.getElementById('tujuanModal');
+      const closeTujuan = document.getElementById('closeTujuanModal');
+      const closeTujuanBtn = document.getElementById('closeTujuanBtn');
+
+      function openTujuan() { tujuanModal.classList.add('open'); }
+      function closeTujuanFn() { tujuanModal.classList.remove('open'); }
+
+      tujuanBtn.addEventListener('click', openTujuan);
+      closeTujuan.addEventListener('click', closeTujuanFn);
+      closeTujuanBtn.addEventListener('click', closeTujuanFn);
+      tujuanModal.addEventListener('click', function(e) { if (e.target === tujuanModal) closeTujuanFn(); });
+
+      // Escape key closes modals
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeInfoFn();
+          closeRulesFn();
+          closeTujuanFn();
+        }
+      });
+
+      /* =========================================================
+         TOUR PEMBUKA — alur cerita "apa yang harus kamu lakukan"
+         ========================================================= */
+      const TOUR_STEPS = [
+        {
+          badge: 'Selamat Datang',
+          title: 'Hai, teman-teman!',
+          desc: 'Aku Ulu, ular penjaga papan Ular Tangga Matematika. Yuk, ikut aku sebentar — aku kasih tahu kamu harus ngapain di sini!',
+          target: null
+        },
+        {
+          badge: 'Tujuan Belajar',
+          title: 'Nanti kamu bisa apa?',
+          desc: 'Kalau kamu belajar dan main sampai selesai di sini, kamu bakal:',
+          list: [
+            'Jago mengalikan dan membagi angka',
+            'Bisa mengerjakan perkalian bersusun (cara menyimpan)',
+            'Bisa membagi dengan cara porogapit (pembagian bersusun)',
+            'Pintar menjawab soal cerita yang ada kali dan baginya',
+            'Berhitung jadi makin cepat dan tepat'
+          ],
+          target: null
+        },
+        {
+          badge: 'Langkah 1',
+          title: 'Tonton videonya dulu',
+          desc: 'Pencet tombol Materi. Di sana ada video yang menjelaskan cara mengalikan dan membagi. Tonton dulu ya, biar kamu paham caranya!',
+          target: '#materiBtn'
+        },
+        {
+          badge: 'Langkah 2',
+          title: 'Baca aturan mainnya',
+          desc: 'Pencet Cara Bermain. Di situ ada aturannya: cara melempar dadu, jalan pion, dan kapan kamu boleh maju.',
+          target: '#caraMainBtn'
+        },
+        {
+          badge: 'Langkah 3',
+          title: 'Ayo main dan jawab soal!',
+          desc: 'Pencet START GAME. Lempar dadu, lalu jawab soal di setiap petak. Jawaban benar bikin kamu maju. Yang sampai FINISH duluan, dia yang menang!',
+          target: '#startGameBtn',
+          last: true
+        }
+      ];
+
+      const tourOverlay = document.getElementById('tourOverlay');
+      const tourSpot = document.getElementById('tourSpotlight');
+      const tourBubble = document.getElementById('tourBubble');
+      const tourBadge = document.getElementById('tourBadge');
+      const tourTitle = document.getElementById('tourTitle');
+      const tourDesc = document.getElementById('tourDesc');
+      const tourList = document.getElementById('tourList');
+      const tourDots = document.getElementById('tourDots');
+      const tourBack = document.getElementById('tourBack');
+      const tourNext = document.getElementById('tourNext');
+      const tourSkip = document.getElementById('tourSkip');
+
+      let tourIndex = 0;
+      let tourActive = false;
+
+      // titik-titik indikator langkah
+      TOUR_STEPS.forEach(function(_, i) {
+        const d = document.createElement('span');
+        d.className = 'tour-dot';
+        d.addEventListener('click', function() { showTourStep(i); });
+        tourDots.appendChild(d);
+      });
+      const dotEls = tourDots.querySelectorAll('.tour-dot');
+
+      function placeBubble(rect) {
+        // reset dulu supaya pengukuran tingginya akurat
+        tourBubble.classList.remove('tour-center', 'tail-top', 'tail-bottom');
+        tourBubble.style.left = '';
+        tourBubble.style.top = '';
+
+        if (!rect) {
+          tourBubble.classList.add('tour-center');
+          return;
+        }
+
+        const bw = tourBubble.offsetWidth;
+        const bh = tourBubble.offsetHeight;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const gap = 18;
+
+        // taruh di bawah target; kalau mepet, pindah ke atas
+        let top = rect.bottom + gap;
+        let tail = 'tail-top';          // ekor di atas bubble (menunjuk ke atas)
+        if (top + bh > vh - 12) {
+          top = rect.top - gap - bh;
+          tail = 'tail-bottom';
+        }
+        // kalau dua-duanya mepet, pusatkan saja
+        if (top < 12) {
+          tourBubble.classList.add('tour-center');
+          return;
+        }
+
+        let left = rect.left + rect.width / 2 - bw / 2;
+        left = Math.max(12, Math.min(left, vw - bw - 12));
+
+        tourBubble.style.left = left + 'px';
+        tourBubble.style.top = top + 'px';
+        tourBubble.classList.add(tail);
+
+        // ekor mengikuti tengah target
+        const tailX = Math.max(20, Math.min(rect.left + rect.width / 2 - left, bw - 20));
+        tourBubble.style.setProperty('--tail-x', tailX + 'px');
+      }
+
+      function moveSpotlight(rect) {
+        if (!rect) {
+          tourSpot.classList.add('no-target');
+          tourSpot.style.width = '0px';
+          tourSpot.style.height = '0px';
+          tourSpot.style.left = (window.innerWidth / 2) + 'px';
+          tourSpot.style.top = (window.innerHeight / 2) + 'px';
+          return;
+        }
+        const pad = 8;
+        tourSpot.classList.remove('no-target');
+        tourSpot.style.left = (rect.left - pad) + 'px';
+        tourSpot.style.top = (rect.top - pad) + 'px';
+        tourSpot.style.width = (rect.width + pad * 2) + 'px';
+        tourSpot.style.height = (rect.height + pad * 2) + 'px';
+      }
+
+      function currentRect() {
+        const step = TOUR_STEPS[tourIndex];
+        if (!step || !step.target) return null;
+        const el = document.querySelector(step.target);
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return (r.width && r.height) ? r : null;
+      }
+
+      function showTourStep(i) {
+        tourIndex = Math.max(0, Math.min(i, TOUR_STEPS.length - 1));
+        const step = TOUR_STEPS[tourIndex];
+
+        tourBadge.textContent = step.badge;
+        tourTitle.textContent = step.title;
+        tourDesc.textContent = step.desc;
+
+        tourList.innerHTML = '';
+        if (step.list) {
+          step.list.forEach(function(t) {
+            const li = document.createElement('li');
+            li.textContent = t;
+            tourList.appendChild(li);
+          });
+        }
+        tourList.hidden = !step.list;
+
+        dotEls.forEach(function(d, k) { d.classList.toggle('active', k === tourIndex); });
+
+        tourBack.hidden = tourIndex === 0;
+        tourNext.textContent = step.last ? 'Siap, Ayo Mulai!' : 'Lanjut';
+        tourNext.classList.toggle('is-final', !!step.last);
+
+        const rect = currentRect();
+        moveSpotlight(rect);
+        placeBubble(rect);
+        // ukur ulang setelah teks terisi (tinggi bubble bisa berubah)
+        requestAnimationFrame(function() { placeBubble(currentRect()); });
+      }
+
+      function startTour() {
+        tourActive = true;
+        document.body.classList.add('tour-active');
+        tourOverlay.classList.add('open');
+        showTourStep(0);
+        setTimeout(function() { tourNext.focus({ preventScroll: true }); }, 300);
+      }
+
+      function endTour() {
+        tourActive = false;
+        tourOverlay.classList.remove('open');
+        document.body.classList.remove('tour-active');
+      }
+
+      tourNext.addEventListener('click', function() {
+        if (tourIndex >= TOUR_STEPS.length - 1) endTour();
+        else showTourStep(tourIndex + 1);
+      });
+      tourBack.addEventListener('click', function() { showTourStep(tourIndex - 1); });
+      tourSkip.addEventListener('click', endTour);
+
+      document.addEventListener('keydown', function(e) {
+        if (!tourActive) return;
+        if (e.key === 'Escape') { endTour(); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); tourNext.click(); }
+        else if (e.key === 'ArrowLeft' && tourIndex > 0) { e.preventDefault(); showTourStep(tourIndex - 1); }
+      });
+
+      // posisi ulang kalau ukuran layar berubah
+      window.addEventListener('resize', function() {
+        if (!tourActive) return;
+        const rect = currentRect();
+        moveSpotlight(rect);
+        placeBubble(rect);
+      });
+
+      // muncul otomatis setiap halaman dibuka
+      setTimeout(startTour, 900);
+
+      /* ---- Audio System ---- */
+      const audio = document.getElementById('bgAudio');
+      const muteBtn = document.getElementById('muteToggleBtn');
+      const audioIcon = document.getElementById('audioIcon');
+      const audioIconPoly = document.getElementById('audioIconPoly');
+      const audioIconLine = document.getElementById('audioIconLine');
+      const audioPanel = document.getElementById('audioPanel');
+      const volumeSlider = document.getElementById('volumeSlider');
+      const volMuteMini = document.getElementById('volMuteMini');
+      const volMiniIcon = document.getElementById('volMiniIcon');
+      const volMiniPoly = document.getElementById('volMiniPoly');
+      const volMiniLine = document.getElementById('volMiniLine');
+
+      const LS_MUTED = 'mtkgame-audio-muted';
+      const LS_VOLUME = 'mtkgame-audio-volume';
+
+      // Restore saved state
+      var savedMuted = localStorage.getItem(LS_MUTED);
+      var savedVol = localStorage.getItem(LS_VOLUME);
+      audio.muted = savedMuted === 'true';
+      if (savedVol) {
+        var v = parseFloat(savedVol);
+        if (!isNaN(v)) { audio.volume = v / 100; volumeSlider.value = Math.round(v); }
+      }
+
+      function setMuteIcon(isMuted, svg, poly, line) {
+        if (!svg || !poly || !line) return;
+        if (isMuted) {
+          poly.setAttribute('points', '9 9 13 9 17 5 17 19 13 15 9 15 9 9 9 9');
+          line.setAttribute('x1', '1'); line.setAttribute('y1', '1');
+          line.setAttribute('x2', '23'); line.setAttribute('y2', '23');
+          svg.setAttribute('stroke', 'var(--color-text-light)');
+        } else {
+          poly.setAttribute('points', '9 9 13 9 17 5 17 19 13 15 9 15 9 9');
+          line.setAttribute('x1', '19'); line.setAttribute('y1', '5');
+          line.setAttribute('x2', '19'); line.setAttribute('y2', '19');
+          svg.setAttribute('stroke', 'var(--color-forest)');
+        }
+      }
+
+      function renderIcons() {
+        setMuteIcon(audio.muted, audioIcon, audioIconPoly, audioIconLine);
+        setMuteIcon(audio.muted, volMiniIcon, volMiniPoly, volMiniLine);
+        muteBtn.classList.toggle('muted', audio.muted);
+      }
+      renderIcons();
+
+      function tryPlay() {
+        if (!audio.muted) audio.play().catch(function(){});
+      }
+      setInterval(tryPlay, 2500);
+      window.addEventListener('pointerdown', tryPlay, { once: true, passive: true });
+      window.addEventListener('keydown', tryPlay, { once: true, passive: true });
+      setTimeout(tryPlay, 300);
+
+      // Toggle dropdown
+      let panelOpen = false;
+      function showPanel() { panelOpen = true; audioPanel.classList.add('show'); document.addEventListener('mousedown', closePanelOutside, true); }
+      function hidePanel() { panelOpen = false; audioPanel.classList.remove('show'); document.removeEventListener('mousedown', closePanelOutside, true); }
+      function closePanelOutside(e) { if (!muteBtn.contains(e.target) && !audioPanel.contains(e.target)) hidePanel(); }
+
+      muteBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        panelOpen ? hidePanel() : showPanel();
+      });
+
+      // Mini mute
+      if (volMuteMini) {
+        volMuteMini.addEventListener('click', function(e) {
+          e.stopPropagation();
+          audio.muted = !audio.muted;
+          localStorage.setItem(LS_MUTED, audio.muted ? 'true' : 'false');
+          if (audio.muted) audio.pause(); else tryPlay();
+          renderIcons();
+        });
+      }
+
+      // Volume slider
+      volumeSlider.addEventListener('input', function() {
+        var val = Math.max(0, Math.min(Number(volumeSlider.value), 100));
+        audio.volume = val / 100;
+        localStorage.setItem(LS_VOLUME, String(val));
+        if (val === 0) { audio.muted = true; localStorage.setItem(LS_MUTED, 'true'); audio.pause(); }
+        else if (audio.muted) { audio.muted = false; localStorage.setItem(LS_MUTED, 'false'); tryPlay(); }
+        renderIcons();
+      });
+
+      audio.addEventListener('volumechange', function() {
+        var pct = Math.round(audio.volume * 100);
+        if (Number(volumeSlider.value) !== pct) volumeSlider.value = pct;
+        renderIcons();
+      });
+
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && panelOpen) hidePanel(); });
+    });
+  })();
+  </script>
+</body>
+</html>

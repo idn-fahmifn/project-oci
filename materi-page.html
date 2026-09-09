@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materi Pembelajaran</title>
+  <meta name="description" content="Pilih materi pembelajaran matematika — perkalian dan pembagian untuk siswa SD kelas III.">
+  <link rel="icon" href="asset/logo.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/materi-page.css">
+</head>
+<body>
+  <!-- Top Bar -->
+  <div class="top-btn-bar">
+    <a href="index.html" class="back-home-btn" aria-label="Kembali ke Home">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 2l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.5z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="var(--color-forest)" stroke-width="2"/></svg>
+    </a>
+    <button class="audio-btn" id="muteToggleBtn" aria-label="Mute / Unmute Audio">
+      <svg id="audioIcon" viewBox="0 0 24 24">
+        <polygon id="audioIconPoly" points="9 9 13 9 17 5 17 19 13 15 9 15 9 9"/>
+        <line id="audioIconLine" x1="19" y1="5" x2="19" y2="19"/>
+      </svg>
+    </button>
+  </div>
+
+  <audio id="bgAudio" src="audio.mp3" loop></audio>
+
+  <div class="page-content">
+    <div class="page-title">
+      <h1>Pilih Materi</h1>
+      <p class="page-subtitle">Di sini kamu belajar dengan cara mencoba sendiri — bukan cuma menonton!</p>
+    </div>
+
+    <div class="course-grid">
+      <!-- Perkalian -->
+      <a href="materi-perkalian.html" class="course-card" id="cardPerkalian">
+        <span class="course-badge">Course 01</span>
+        <div class="course-icon">&#x2716;</div>
+        <div class="course-title">Perkalian</div>
+        <p class="course-desc">Susun sendiri kotak perkalian, lompat di garis bilangan, lalu kerjakan perkalian bersusun dengan teknik menyimpan.</p>
+        <div class="course-meta">3 Level Main &bull; Kotak Ajaib &middot; Lompat Angka &middot; Bersusun</div>
+      </a>
+
+      <!-- Pembagian -->
+      <a href="materi-pembagian.html" class="course-card" id="cardPembagian">
+        <span class="course-badge">Course 02</span>
+        <div class="course-icon">&#x00F7;</div>
+        <div class="course-title">Pembagian</div>
+        <p class="course-desc">Bagikan sendiri bendanya sampai sama rata, cari pasangan perkaliannya, lalu kerjakan pembagian cara porogapit.</p>
+        <div class="course-meta">3 Level Main &bull; Bagi Rata &middot; Tebak Pasangan &middot; Porogapit</div>
+      </a>
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('ready');
+
+    // Audio system (shared pattern)
+    var audio = document.getElementById('bgAudio');
+    var muteBtn = document.getElementById('muteToggleBtn');
+    var icon = document.getElementById('audioIcon');
+    var poly = document.getElementById('audioIconPoly');
+    var line = document.getElementById('audioIconLine');
+    var LS_MUTED = 'mtkgame-audio-muted';
+    var LS_VOLUME = 'mtkgame-audio-volume';
+
+    audio.muted = localStorage.getItem(LS_MUTED) === 'true';
+    var sv = localStorage.getItem(LS_VOLUME);
+    if (sv) { var v = parseFloat(sv); if (!isNaN(v)) audio.volume = v / 100; }
+
+    function renderIcon() {
+      if (audio.muted) {
+        poly.setAttribute('points', '9 9 13 9 17 5 17 19 13 15 9 15 9 9 9 9');
+        line.setAttribute('x1','1'); line.setAttribute('y1','1'); line.setAttribute('x2','23'); line.setAttribute('y2','23');
+        icon.setAttribute('stroke', 'var(--color-text-light)');
+        muteBtn.classList.add('muted');
+      } else {
+        poly.setAttribute('points', '9 9 13 9 17 5 17 19 13 15 9 15 9 9');
+        line.setAttribute('x1','19'); line.setAttribute('y1','5'); line.setAttribute('x2','19'); line.setAttribute('y2','19');
+        icon.setAttribute('stroke', 'var(--color-forest)');
+        muteBtn.classList.remove('muted');
+      }
+    }
+    renderIcon();
+
+    function tryPlay() { if (!audio.muted) audio.play().catch(function(){}); }
+    setInterval(tryPlay, 2500);
+    window.addEventListener('pointerdown', tryPlay, { once: true, passive: true });
+    setTimeout(tryPlay, 300);
+
+    muteBtn.addEventListener('click', function() {
+      audio.muted = !audio.muted;
+      localStorage.setItem(LS_MUTED, audio.muted ? 'true' : 'false');
+      if (audio.muted) audio.pause(); else tryPlay();
+      renderIcon();
+    });
+
+    // Page transitions for cards
+    document.querySelectorAll('.course-card').forEach(function(card) {
+      card.addEventListener('click', function(e) {
+        if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          document.body.style.opacity = '0';
+          setTimeout(function() { window.location.href = card.getAttribute('href'); }, 400);
+        }
+      });
+    });
+  });
+  </script>
+</body>
+</html>
