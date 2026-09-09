@@ -44,6 +44,31 @@ body::before {
   justify-content: center;
 }
 
+/* Bingkai ranting + foto (SVG) */
+.profile-frame {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  display: block;
+  overflow: visible;
+  animation: float-gentle 3.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 12px 26px rgba(60, 40, 15, 0.28));
+}
+
+.profile-frame .frame-bird {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: bird-peck 4.5s ease-in-out infinite;
+}
+
+@keyframes bird-peck {
+  0%, 62%, 100% { transform: rotate(0deg); }
+  70% { transform: rotate(-9deg); }
+  78% { transform: rotate(3deg); }
+  86% { transform: rotate(-4deg); }
+}
+
+/* Aturan lama untuk <img> — disisakan kalau nanti fotonya dikembalikan ke gambar */
 .profile-image {
   width: 100%;
   max-width: 360px;
@@ -67,6 +92,19 @@ body::before {
   padding: 32px 36px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+.bio-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3vw, 1.55rem);
+  font-weight: 800;
+  color: var(--color-forest);
+  margin: 0 0 12px;
+}
+
+.bio-closing {
+  font-weight: 800;
+  color: var(--color-forest);
 }
 
 .bio-card p {
@@ -195,8 +233,8 @@ body::before {
 .interest-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  max-width: 860px;
+  gap: 16px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -205,11 +243,11 @@ body::before {
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
-  padding: 24px 16px;
+  padding: 20px 15px 22px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 11px;
   transition: all var(--duration-normal) var(--ease-out);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -221,10 +259,19 @@ body::before {
 }
 
 .interest-card img {
-  width: 160px;
-  height: 160px;
+  width: clamp(84px, 9vw, 116px);
+  height: clamp(84px, 9vw, 116px);
   object-fit: contain;
   transition: transform var(--duration-normal) var(--ease-out);
+}
+
+/* Deskripsi tiap hobi — teksnya dari dokumen klien */
+.interest-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  text-align: center;
 }
 
 .interest-card:hover img {
@@ -232,12 +279,13 @@ body::before {
 }
 
 .interest-card .interest-label {
-  padding: 8px 18px;
+  padding: 7px 16px;
   border-radius: var(--radius-full);
   background: var(--color-gold-pale);
   color: var(--color-amber);
-  font-weight: 700;
-  font-size: 0.85rem;
+  font-weight: 800;
+  font-size: 0.84rem;
+  text-align: center;
 }
 
 /* Responsive */
@@ -252,8 +300,8 @@ body::before {
     text-align: center;
   }
 
-  .profile-image {
-    max-width: 280px;
+  .profile-image, .profile-frame {
+    max-width: 300px;
     margin: 0 auto;
   }
 
@@ -275,8 +323,8 @@ body::before {
   }
 
   .interest-card img {
-    width: 80px;
-    height: 80px;
+    width: 74px;
+    height: 74px;
   }
 
   .belief-card {
@@ -290,15 +338,28 @@ body::before {
     width: min(100vw - 20px, 1080px);
   }
 
-  .profile-image {
-    max-width: 220px;
+  .profile-image, .profile-frame {
+    max-width: 240px;
   }
 
   .bio-card {
     padding: 20px 18px;
   }
 
-  .bio-card p {
+  .bio-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3vw, 1.55rem);
+  font-weight: 800;
+  color: var(--color-forest);
+  margin: 0 0 12px;
+}
+
+.bio-closing {
+  font-weight: 800;
+  color: var(--color-forest);
+}
+
+.bio-card p {
     font-size: 0.9rem;
   }
 
@@ -307,9 +368,11 @@ body::before {
   }
 
   .interest-card img {
-    width: 60px;
-    height: 60px;
+    width: 62px;
+    height: 62px;
   }
+
+  .interest-desc { font-size: 0.78rem; }
 
   .interest-card .interest-label {
     font-size: 0.75rem;

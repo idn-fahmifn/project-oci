@@ -1651,3 +1651,94 @@ body.fadein { opacity: 1; }
   .podium-block { width: 62px; }
   .podium-rank { font-size: 31px; }
 }
+
+
+/* ============================================
+   KARTU BENAR! / SALAH! — memakai artwork asli
+   dari dokumen klien (asset/card-*.png).
+   Aturan kayu & panel sebelumnya di-reset di sini
+   karena desain ini wajib sama dengan acuan.
+   ============================================ */
+.fb-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+}
+
+.feedback-card {
+  position: relative;
+  width: min(88vw, 358px);
+  max-width: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  animation: zoomIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fb-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
+}
+
+/* Teks "<Nama> maju <n> langkah." — ditumpangkan tepat di area
+   subjudul pada artwork (koordinatnya diukur dari gambar). */
+.fb-sub {
+  position: absolute;
+  left: 11.6%;
+  width: 79.5%;
+  top: 66.4%;
+  height: 15.7%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-weight: 800;
+  color: #23331a;
+  font-size: clamp(13px, 4.3vw, 19px);
+  line-height: 1.25;
+  pointer-events: none;
+}
+
+.fb-salah .fb-sub { display: none; }   /* kartu SALAH: kalimatnya sudah di gambar */
+
+/* Area klik tepat di atas tombol yang tergambar */
+.fb-btn-hit {
+  position: absolute;
+  left: 27.3%;
+  width: 45.4%;
+  top: 87.2%;
+  height: 11%;
+  border: none;
+  background: transparent;
+  border-radius: 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fb-salah .fb-btn-hit { left: 27.7%; width: 44.8%; }
+
+.fb-btn-hit:hover { filter: brightness(1.06); }
+.fb-btn-hit:active { transform: translateY(2px); }
+.fb-btn-hit:focus-visible { outline: 3px solid #fff8e1; outline-offset: 2px; }
+
+/* Keterangan jawaban benar — di luar artwork supaya desainnya tetap utuh */
+.fb-note {
+  margin-top: 14px;
+  padding: 9px 18px;
+  border-radius: var(--radius-full, 999px);
+  background: rgba(58, 30, 8, 0.9);
+  border: 2px solid rgba(255, 233, 184, 0.5);
+  color: #ffe9b8;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  max-width: min(88vw, 358px);
+  line-height: 1.45;
+}

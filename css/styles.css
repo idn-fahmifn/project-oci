@@ -315,6 +315,16 @@ body.ready { opacity: 1; transition: opacity 0.6s var(--ease-out); }
   text-shadow: var(--wood-text-shadow);
 }
 
+.tujuan-lead {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffe9b8;
+  text-align: center;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 4px rgba(74, 40, 14, 0.9);
+}
+
 .tujuan-intro {
   font-size: 0.9rem;
   font-weight: 700;

@@ -167,38 +167,18 @@
     </div>
   </div>
 
-  <!-- Feedback Modal -->
-  <div id="successModal" class="modal-overlay" style="background:rgba(0,0,0,0.45)">
-    <div class="feedback-card" id="feedbackBox">
-      <!-- Panel hijau/merah + ular yang nongol di atas kartu (acuan dokumen klien) -->
-      <div class="feedback-panel">
-        <div class="feedback-mascot">
-          <svg viewBox="0 0 96 74" class="snake-mascot-svg feedback-snake">
-            <!-- badan ular melingkar di tepi atas kartu -->
-            <path d="M8 66 Q4 34 26 22 Q52 8 74 20 Q92 30 88 52"
-                  fill="none" stroke="#4b9b3a" stroke-width="15" stroke-linecap="round"/>
-            <path d="M8 66 Q4 34 26 22 Q52 8 74 20 Q92 30 88 52"
-                  fill="none" stroke="#7cc45b" stroke-width="9" stroke-linecap="round"/>
-            <!-- daun kecil -->
-            <ellipse cx="30" cy="20" rx="8" ry="4.5" fill="#66bb6a" transform="rotate(-24 30 20)"/>
-            <ellipse cx="66" cy="17" rx="7" ry="4" fill="#81c784" transform="rotate(18 66 17)"/>
-            <!-- kepala -->
-            <ellipse cx="14" cy="60" rx="15" ry="12" fill="#7cc45b"/>
-            <ellipse cx="14" cy="58" rx="12" ry="9" fill="#9ccc65"/>
-            <circle cx="9" cy="55" r="4" fill="#fff"/><circle cx="20" cy="55" r="4" fill="#fff"/>
-            <circle cx="9.5" cy="55.5" r="2" fill="#1a1a1a"/><circle cx="20.5" cy="55.5" r="2" fill="#1a1a1a"/>
-            <ellipse cx="14" cy="64" rx="6" ry="3" fill="#e8f5a3"/>
-            <path d="M14 67 L14 72 M14 72 L11 74 M14 72 L17 74" stroke="#e53935"
-                  stroke-width="2" stroke-linecap="round" fill="none"/>
-          </svg>
-        </div>
-
-        <div class="feedback-icon" id="feedbackIcon" aria-hidden="true"></div>
-        <div class="feedback-badge" id="feedbackBadge">BENAR!</div>
-        <div class="feedback-text" id="resultFeedbackText">Hebat! Jawabanmu benar.</div>
-        <div class="feedback-note" id="feedbackNote"></div>
-        <button class="feedback-btn" id="feedbackBtn" onclick="closeFeedback()">Lanjutkan</button>
+  <!-- Feedback Modal — memakai artwork BENAR!/SALAH! dari dokumen klien
+       (asset/card-benar.png & card-salah.png). Teks "<Nama> maju <n> langkah."
+       ditumpangkan sebagai HTML supaya tetap dinamis. -->
+  <div id="successModal" class="modal-overlay" style="background:rgba(0,0,0,0.5)">
+    <div class="fb-stack">
+      <div class="feedback-card fb-benar" id="feedbackBox">
+        <img class="fb-art" id="fbArt" src="asset/card-benar.png" alt="" draggable="false">
+        <div class="fb-sub" id="resultFeedbackText"></div>
+        <button class="fb-btn-hit" id="feedbackBtn" type="button"
+                onclick="closeFeedback()" aria-label="Lanjutkan"></button>
       </div>
+      <div class="fb-note" id="feedbackNote"></div>
     </div>
   </div>
 
@@ -1144,39 +1124,27 @@
 
     function showFeedback(success, message, note) {
       if (!feedbackModal) return;
-      const feedbackBox = document.getElementById("feedbackBox");
-      const feedbackBadge = document.getElementById("feedbackBadge");
-      const feedbackBtn = document.getElementById("feedbackBtn");
-      const feedbackIcon = document.getElementById("feedbackIcon");
-      const feedbackNote = document.getElementById("feedbackNote");
-      const panel = feedbackBox.querySelector(".feedback-panel");
+      const box  = document.getElementById("feedbackBox");
+      const art  = document.getElementById("fbArt");
+      const sub  = document.getElementById("resultFeedbackText");
+      const btn  = document.getElementById("feedbackBtn");
+      const noteEl = document.getElementById("feedbackNote");
 
-      if (feedbackIcon) {
-        feedbackIcon.textContent = success ? "\u2714" : "\u2716";
-        feedbackIcon.className = "feedback-icon " + (success ? "ok" : "no");
-      }
-      if (feedbackNote) {
-        feedbackNote.textContent = note || "";
-        feedbackNote.style.display = note ? "" : "none";
-      }
-      if (panel) {
-        panel.className = "feedback-panel " + (success ? "panel-ok" : "panel-no");
+      // Artwork sesuai hasil jawaban
+      art.src = success ? "asset/card-benar.png" : "asset/card-salah.png";
+      box.className = "feedback-card " + (success ? "fb-benar" : "fb-salah");
+      btn.setAttribute("aria-label", success ? "Lanjutkan" : "Coba Lagi");
+
+      // Kartu SALAH sudah memuat kalimatnya di gambar, jadi teks HTML
+      // hanya dipakai di kartu BENAR (namanya & jumlah langkah berubah-ubah).
+      sub.textContent = success ? message : "";
+
+      if (noteEl) {
+        noteEl.textContent = note || "";
+        noteEl.style.display = note ? "" : "none";
       }
 
-      if (feedbackBadge) {
-        feedbackBadge.innerText = success ? "BENAR!" : "SALAH!";
-        feedbackBadge.className = "feedback-badge " + (success ? "feedback-correct" : "feedback-wrong");
-      }
-      resultFeedbackText.innerText = message;
-      if (feedbackBtn) {
-        feedbackBtn.innerText = success ? "Lanjutkan" : "Coba Lagi";
-        feedbackBtn.className = "feedback-btn " + (success ? "feedback-btn-correct" : "feedback-btn-wrong");
-      }
-      if (feedbackBox) {
-        feedbackBox.className = "feedback-card " + (success ? "feedback-card-correct" : "feedback-card-wrong");
-      }
       showModal("successModal");
-
       return new Promise(resolve => { feedbackResolve = resolve; });
     }
 
