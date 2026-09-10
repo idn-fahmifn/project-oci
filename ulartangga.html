@@ -91,6 +91,10 @@
     <div class="modal-simple">
       <button class="popup-close" type="button" onclick="tutupUrutanMain()" aria-label="Tutup" title="Tutup">&times;</button>
       <h2>Siapa yang Mulai?</h2>
+      <!-- Pengingat dari klien: hewan pemain dibagikan otomatis, jadi
+           anak-anak perlu diingatkan menyepakati & mengingat hewannya
+           masing-masing sebelum permainan jalan. -->
+      <p class="start-order-catatan">Silakan diskusikan dan ingat hewan yang dipilih untuk masing-masing pemain.</p>
       <p id="startOrderText">Setiap pemain memutar dadu untuk menentukan giliran mulai. Nilai dadu terbesar akan jadi pemain pertama.</p>
       <div class="start-dice-stage">
         <div id="startPlayerChip" class="start-player-chip">Siap mulai</div>
@@ -110,8 +114,9 @@
 
   <!-- Status Panel -->
   <div class="status-panel">
-    <div class="timer-box">
-      Waktu main: <span id="timerDisplay">00:00</span>
+    <!-- Hitung mundur 30 menit; habis waktu langsung ke papan juara -->
+    <div class="timer-box" id="timerBox">
+      Sisa waktu: <span id="timerDisplay">30:00</span>
     </div>
     <div class="scoreboard">
       <h3>Papan Posisi</h3>
@@ -170,6 +175,10 @@
         <img src="https://img.icons8.com/?size=100&id=7uJob2d9mFBS&format=png&color=000000" alt="Harimau" style="width:38px;height:38px;vertical-align:middle" id="quizIconTiger">
       </span>
       <h3>Tantangan Matematika</h3>
+      <!-- Batas waktu menjawab: 1 menit. Lewat dari itu dihitung salah. -->
+      <div id="quizTimerBox" class="quiz-timer">
+        Sisa waktu <strong id="quizTimer">01:00</strong>
+      </div>
       <div id="quizQuestion" class="quiz-question">5 + 5 = ?</div>
       <input type="number" id="quizAnswer" class="quiz-input" placeholder="Jawaban">
       <div id="error-msg"></div>
@@ -251,6 +260,9 @@
     const errorMsg = document.getElementById("error-msg");
     const quizIcon = document.getElementById("quizIcon");
     const timerDisplay = document.getElementById("timerDisplay");
+    const timerBox = document.getElementById("timerBox");
+    const quizTimerEl = document.getElementById("quizTimer");
+    const quizTimerBox = document.getElementById("quizTimerBox");
     const scoreboardList = document.getElementById("scoreboardList");
     const diceStatus = document.getElementById("diceStatus");
     const startOrderText = document.getElementById("startOrderText");
@@ -436,7 +448,7 @@
     });
 
     const endCell = 46;
-    const maxGameSeconds = 20 * 60;
+    const maxGameSeconds = 30 * 60;   // batas main 30 menit (permintaan klien)
 
     let activePlayers = [];
     let turnIndex = 0;
@@ -777,6 +789,7 @@
        jawaban salah (pion tetap di tempat, giliran berpindah) supaya
        tidak bisa dipakai melewati soal tanpa akibat. */
     function lewatiSoal() {
+      stopQuizTimer();
       hideModal("quizModal");
       handleQuizResult(false);
     }
@@ -877,18 +890,69 @@
       updateTimer();
     }
 
+    /* Papan waktu memakai HITUNG MUNDUR (permintaan klien): anak-anak
+       jadi tahu sisa waktunya, bukan cuma sudah main berapa lama.
+       Waktu yang sudah terpakai tetap dihitung terpisah karena itu yang
+       ditampilkan di papan juara. */
+    function detikTerpakai() {
+      if (!startTime) return 0;
+      return Math.min(maxGameSeconds, Math.floor((Date.now() - startTime) / 1000));
+    }
+
     function updateTimer() {
       if (!startTime) return;
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      timerDisplay.innerText = formatTime(elapsed);
+      const sisa = Math.max(0, maxGameSeconds - elapsed);
+      timerDisplay.innerText = formatTime(sisa);
+      if (timerBox) timerBox.classList.toggle("mendesak", sisa <= 60);
       if (elapsed >= maxGameSeconds) {
         clearInterval(timerInterval);
         handleTimeUp();
       }
     }
 
+    /* ---------- batas waktu 1 menit per soal ----------
+       Lewat dari 1 menit, soalnya otomatis dihitung salah dan giliran
+       pindah. Pencacahnya harus dimatikan di SETIAP jalan keluar dari
+       pop up soal (kirim jawaban, tombol x, dan waktu permainan habis),
+       kalau tidak ia masih berjalan di latar dan menutup pop up lain. */
+    const QUIZ_SECONDS = 60;
+    let quizTimerInterval = null;
+    let quizDeadline = 0;
+
+    function startQuizTimer() {
+      stopQuizTimer();
+      quizDeadline = Date.now() + QUIZ_SECONDS * 1000;
+      renderQuizTimer();
+      quizTimerInterval = setInterval(renderQuizTimer, 250);
+    }
+
+    function stopQuizTimer() {
+      if (quizTimerInterval) clearInterval(quizTimerInterval);
+      quizTimerInterval = null;
+      if (quizTimerBox) quizTimerBox.classList.remove("mendesak");
+    }
+
+    function renderQuizTimer() {
+      const sisa = Math.max(0, Math.ceil((quizDeadline - Date.now()) / 1000));
+      if (quizTimerEl) quizTimerEl.innerText = formatTime(sisa);
+      if (quizTimerBox) quizTimerBox.classList.toggle("mendesak", sisa <= 10);
+      if (sisa <= 0) {
+        stopQuizTimer();
+        waktuSoalHabis();
+      }
+    }
+
+    function waktuSoalHabis() {
+      if (!gameActive) return;
+      hideModal("quizModal");
+      handleQuizResult(false, true);
+    }
+
     function handleTimeUp() {
       gameActive = false;
+      stopQuizTimer();
+      hideModal("quizModal");
       const finalOrder = activePlayers
         .slice()
         .sort((a, b) => b.pos - a.pos || a.index - b.index);
@@ -911,7 +975,7 @@
         v: 1,
         timeUp: !!timeUp,
         endCell: endCell,
-        waktu: timerDisplay ? timerDisplay.innerText : "",
+        waktu: formatTime(detikTerpakai()),   // waktu terpakai, bukan sisa
         ranked: ranked.map((p) => ({
           label: p.label,
           icon: p.icon,
@@ -983,6 +1047,7 @@
       quizInput.value = "";
       errorMsg.innerText = "";
       showModal("quizModal");
+      startQuizTimer();
       quizInput.focus();
     }
 
@@ -1024,6 +1089,7 @@
         errorMsg.innerText = "Isi jawaban dengan angka terlebih dahulu.";
         return;
       }
+      stopQuizTimer();
       hideModal("quizModal");
       const success = answer === correctAnswer;
       handleQuizResult(success);
@@ -1108,13 +1174,34 @@
       if (feedbackResolve) { feedbackResolve(); feedbackResolve = null; }
     }
 
-    async function handleQuizResult(success) {
+    /* Urutannya: KARTU BENAR/SALAH DULU, baru pionnya jalan (permintaan
+       klien). Anak jadi tahu hasil jawabannya lebih dulu, lalu menonton
+       hewannya maju sambil ikut menghitung langkahnya.
+       `karenaWaktu` dipakai kalau salahnya bukan karena jawaban keliru,
+       melainkan karena 1 menitnya habis. */
+    async function handleQuizResult(success, karenaWaktu = false) {
       const player = currentPlayerForQuiz;
       if (!player) return;
+      stopQuizTimer();
       const moveAmount = success ? currentRoll : 0;
       const targetPosition = success
         ? Math.min(endCell, player.pos + moveAmount)
         : player.pos;
+
+      // 1) umpan balik lebih dulu, tunggu sampai kartunya ditutup pemain
+      // Kalimat mengikuti acuan dokumen klien:
+      // benar -> "<Nama> maju <n> langkah."   salah -> "Coba lagi, kamu pasti bisa!"
+      const message = success
+        ? `${player.label} maju ${moveAmount} langkah.`
+        : "Coba lagi, kamu pasti bisa!";
+      const note = success
+        ? ""
+        : (karenaWaktu
+            ? `Waktu 1 menit habis, ${player.label} tetap di tempat. Jawaban yang benar: ${correctAnswer}`
+            : `${player.label} tetap di tempat. Jawaban yang benar: ${correctAnswer}`);
+      await showFeedback(success, message, note);
+
+      // 2) baru hewannya bergerak
       if (success) {
         await animatePlayerMovement(player, targetPosition);
         const shortcut = shortcuts[player.pos];
@@ -1133,21 +1220,14 @@
         }
       }
       renderScoreboard();
+
+      // 3) sudah sampai finish?
       if (player.pos === endCell) {
         gameActive = false;
         clearInterval(timerInterval);
         showWinModal(player, false);
         return;
       }
-      // Kalimat mengikuti acuan dokumen klien:
-      // benar -> "<Nama> maju <n> langkah."   salah -> "Coba lagi, kamu pasti bisa!"
-      const message = success
-        ? `${player.label} maju ${moveAmount} langkah.`
-        : "Coba lagi, kamu pasti bisa!";
-      const note = success
-        ? ""
-        : `${player.label} tetap di tempat. Jawaban yang benar: ${correctAnswer}`;
-      await showFeedback(success, message, note);
       nextTurn();
     }
 
@@ -1164,6 +1244,7 @@
 
     function resetGame() {
       gameActive = false;
+      stopQuizTimer();
       if (timerInterval) clearInterval(timerInterval);
       activePlayers = [];
       turnIndex = 0;
@@ -1182,7 +1263,8 @@
       updateCurrentPlayerDisplay();
       renderScoreboard();
       updateDiceStatus("Klik dadu untuk pilih tantangan.");
-      timerDisplay.innerText = "00:00";
+      timerDisplay.innerText = formatTime(maxGameSeconds);
+      if (timerBox) timerBox.classList.remove("mendesak");
       showModal("welcomeModal");
     }
 

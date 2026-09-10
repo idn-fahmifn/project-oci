@@ -2023,3 +2023,84 @@ body.fadein { opacity: 1; }
   max-width: min(88vw, 358px);
   line-height: 1.45;
 }
+
+/* ============================================
+   BATAS WAKTU: 30 MENIT PER PERMAINAN & 1 MENIT PER SOAL
+
+   Dua-duanya hitung mundur. Kelas .mendesak dipasang lewat JS saat
+   waktunya tinggal sedikit (60 detik untuk permainan, 10 detik untuk
+   soal) supaya anak-anak sadar tanpa perlu membaca angkanya.
+   Kedipannya dimatikan kalau pengguna memilih "kurangi gerakan".
+   ============================================ */
+@keyframes waktuBerdenyut {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+
+.timer-box.mendesak {
+  color: #b3261e;
+  border-color: rgba(179, 38, 30, 0.45);
+  background: rgba(255, 240, 238, 0.96);
+  animation: waktuBerdenyut 1s ease-in-out infinite;
+}
+
+/* pencacah di dalam pop up soal */
+.quiz-timer {
+  display: inline-block;
+  margin: 2px auto 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(255, 244, 214, 0.9);
+  border: 2px solid var(--wood-mid, #b07a3c);
+  color: #6b4a1c;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.quiz-timer strong {
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;   /* angkanya tidak geser-geser */
+}
+
+.quiz-timer.mendesak {
+  background: #ffe9e6;
+  border-color: #d9584d;
+  color: #b3261e;
+  animation: waktuBerdenyut 0.7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer-box.mendesak,
+  .quiz-timer.mendesak { animation: none; }
+}
+
+/* Pengingat menyepakati hewan tiap pemain, di pop up urutan main.
+   Ditulis .modal-simple .start-order-catatan (bukan kelasnya saja)
+   supaya menang atas aturan .modal-simple p yang memberi semua
+   paragraf pop up tampilan kartu krem biasa — kalau kalah, pengingat
+   ini tidak kelihatan beda dari teks di bawahnya. */
+.modal-simple .start-order-catatan {
+  margin: 0 0 10px;
+  padding: 10px 14px 10px 40px;
+  border-radius: 14px;
+  background: #fff3d0;
+  border: 2px dashed #c08a3e;
+  box-shadow: none;
+  color: #6b4a1c;
+  font-size: 14.5px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: left;
+  position: relative;
+}
+
+.modal-simple .start-order-catatan::after {
+  content: "📌";
+  position: absolute;
+  left: 12px;
+  top: 9px;
+  font-size: 18px;
+  line-height: 1.2;
+}

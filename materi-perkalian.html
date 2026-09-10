@@ -161,7 +161,7 @@
       var t = el('div', 'task-text');
       t.innerHTML = 'Si Kodok mulai dari <strong>0</strong>. Dia melompat <strong>' +
         s.step + ' langkah</strong> setiap kali, sebanyak <strong>' + s.times + ' kali</strong>.<br>' +
-        'Lompatkan kodoknya, lalu lihat dia berhenti di angka berapa!';
+        'Lompatkan kodoknya, lalu hitung sendiri dia berhenti di angka berapa!';
       task.appendChild(t);
 
       var wrap = el('div', 'numline-wrap');
@@ -176,7 +176,7 @@
       line.appendChild(hopper);
       wrap.appendChild(line);
 
-      var log = el('div', 'jump-log', '0');
+      var log = el('div', 'jump-log', 'Belum melompat');
 
       function placeHopper() {
         hopper.style.left = (at * 34 + 17) + 'px';
@@ -200,9 +200,12 @@
         placeHopper();
         wrap.scrollLeft = Math.max(0, at * 34 - wrap.clientWidth / 2);
 
+        /* Hasil penjumlahannya SENGAJA tidak ditampilkan (permintaan
+           klien): yang ditulis hanya deret penjumlahannya, hasilnya
+           dihitung sendiri oleh siswa di kotak jawaban. */
         var parts = [];
         for (var k = 1; k <= jumps; k++) parts.push(s.step);
-        log.textContent = parts.join(' + ') + ' = ' + at;
+        log.textContent = parts.join(' + ') + ' = ?';
 
         if (jumps >= s.times) {
           bJump.disabled = true;
@@ -215,7 +218,7 @@
         at = 0; jumps = 0;
         ticks.forEach(function (n) { n.classList.remove('marked'); });
         placeHopper();
-        log.textContent = '0';
+        log.textContent = 'Belum melompat';
         bJump.disabled = false;
         answerHost.style.display = 'none';
         api.clearMsg();
