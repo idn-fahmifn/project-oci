@@ -1486,3 +1486,61 @@ body.ready { opacity: 1; transition: opacity 0.6s var(--ease-out); }
    dalam pop up dimatikan supaya tidak tampil dua ular sekaligus. */
 .info-modal .info-mascot,
 .tujuan-modal .tujuan-mascot { display: none; }
+
+/* ============================================
+   LATAR BELAKANG DI POP UP INFORMASI
+
+   Dipindahkan ke sini dari pop up "Cara Bermain" (catatan klien:
+   isinya kebalik). Ini keterangan TENTANG medianya — bacaan guru &
+   orang tua — jadi tampilannya dibuat lebih tenang daripada kartu
+   langkah anak-anak di atasnya: kertas krem, teks rata kiri, dan
+   ukuran huruf sedikit lebih kecil.
+   ============================================ */
+.info-latar {
+  margin: 4px 0 18px;
+  padding: 16px 18px 14px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--paper-1) 0%, var(--paper-2) 100%);
+  border: 3px solid var(--wood-mid);
+  box-shadow: var(--paper-shadow);
+  text-align: left;
+}
+
+.info-latar-judul {
+  margin: 0 0 8px;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--color-wood);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-latar-judul::before {
+  content: "\1F4D6";        /* buku terbuka */
+  font-size: 1.05rem;
+}
+
+.info-latar-teks,
+.info-latar-catatan {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.75;
+  color: #5c4326;
+  text-align: justify;
+}
+
+.info-latar-catatan {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 2px dashed rgba(141, 85, 36, 0.35);
+  font-style: italic;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 480px) {
+  .info-latar { padding: 14px 15px 12px; }
+  .info-latar-teks,
+  .info-latar-catatan { font-size: 0.8rem; text-align: left; }
+}
