@@ -12,6 +12,12 @@
 (function (global) {
   'use strict';
 
+  /* Efek suara bersifat opsional: halaman yang belum memuat
+     js/suara.js tetap jalan normal, cuma tanpa bunyi. */
+  function bunyi(nama) {
+    if (global.Suara) global.Suara.mainkan(nama);
+  }
+
   function el(tag, cls, text) {
     var n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -121,7 +127,7 @@
         round: this.round,
         rounds: lv.rounds,
         win: function (text) { self.onWin(text); },
-        no: function (text) { self.say(text, 'no'); },
+        no: function (text) { bunyi('salah'); self.say(text, 'no'); },
         tip: function (text) { self.say(text, 'tip'); },
         ok: function (text) { self.say(text, 'ok'); },
         clearMsg: function () { self.say('', null); }
@@ -141,6 +147,7 @@
     onWin: function (text) {
       var self = this;
       var lv = this.levels[this.current];
+      bunyi('benar');
       this.say(text || 'Benar! Hebat!', 'ok');
 
       // matikan input supaya tidak bisa dijawab dua kali
@@ -164,6 +171,7 @@
     levelClear: function () {
       var self = this;
       var lv = this.levels[this.current];
+      bunyi('juara');            // satu level tuntas: pantas dapat fanfare
       this.saveProgress(this.current + 1);
       this.renderLevelBar();
 

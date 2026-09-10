@@ -2,7 +2,9 @@
    ULARTANGGA.CSS — Snake & Ladder Game Page
    ============================================ */
 
-@import url("https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600;700;800&display=swap");
+/* Font dimuat lewat <link> di ulartangga.html (Baloo 2 + Nunito).
+   Import Fredoka One/Poppins dihapus: sudah tidak dipakai dan
+   @import menahan proses render. */
 
 :root {
   /* ---- Tema Papan Kayu (semua pop up) ---- */
@@ -33,6 +35,8 @@
   --volume-slider-track: #c8e6c9;
   --volume-slider-thumb: #1a6b3c;
   --game-radius: 22px;
+  /* rasio ilustrasi papan (2496x1696) — dipakai papan & panel melayang */
+  --board-ratio: 1.4717;
 }
 
 /* ---------- Base ---------- */
@@ -269,6 +273,7 @@ body.fadein { opacity: 1; }
   max-width: 920px;
   width: min(100%, 920px);
   padding: 0 8px;
+  box-sizing: border-box;    /* tanpa ini padding-nya menambah lebar -> ponsel jadi bisa digeser ke samping */
 }
 
 .timer-box, .scoreboard {
@@ -299,6 +304,17 @@ body.fadein { opacity: 1; }
   #scoreboardList.two-col .player-status { display: none; }
   .scoreboard { padding: 8px 10px; min-width: 0; }
   .status-panel { gap: 8px; }
+}
+
+/* Layar lebar tapi pendek (laptop pada umumnya): papan ular tangga terkunci
+   oleh tinggi, jadi panel posisi dijadikan satu baris supaya tinggi yang
+   dihemat langsung dipakai papan — papannya jadi jauh lebih besar. */
+@media (min-width: 900px) and (max-height: 920px) {
+  #scoreboardList.two-col { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  #scoreboardList.two-col .player-score { padding: 5px 8px; font-size: 12px; }
+  .scoreboard { padding: 8px 12px; }
+  .timer-box { padding: 8px 14px; font-size: 15px; }
+  .status-panel { gap: 8px; margin-bottom: 6px; }
 }
 
 .timer-box {
@@ -383,51 +399,68 @@ body.fadein { opacity: 1; }
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   margin-bottom: auto;       /* pasangan margin-top auto di status panel */
+  /* Lebar dibuat pasti (bukan menyesuaikan isi) supaya width:100% papan
+     punya acuan yang jelas — kalau tidak, lebar papan malah mengikuti
+     lebar baris kontrol dan jadi menyusut sendiri di layar besar. */
+  width: min(100%, 1024px);
+  box-sizing: border-box;
 }
 
-/* ---------- Board ---------- */
+/* ---------- Board ----------
+   Papan = satu ilustrasi (asset/board-ular-tangga.*) dengan rasio
+   2496x1696 = 1.4717. Lebarnya dibatasi tiga hal sekaligus: lebar
+   layar, batas maksimum, dan tinggi yang tersisa setelah status panel
+   + kontrol (--board-reserve) dikalikan rasio. Jadi papan selalu utuh
+   tanpa perlu di-zoom-out, baik di laptop pendek maupun di ponsel. */
 .board-container {
   position: relative;
-  width: min(95vw, 760px);
-  /* 100vh - 300px = ruang yang dipakai status panel, kontrol dan padding.
-     Ini yang bikin papan menyusut sendiri di laptop layar pendek. */
-  height: min(95vw, 540px, calc(100vh - var(--board-reserve, 300px)));
-  min-height: 240px;
+  /* 100% = lebar isi .game-wrapper, jadi padding pembungkus sudah ikut
+     terhitung dan papan tidak pernah menonjol keluar layar. */
+  width: min(100%, 980px,
+             calc((100vh - var(--board-reserve, 300px)) * var(--board-ratio)));
+  aspect-ratio: 2496 / 1696;
+  height: auto;
+  box-sizing: border-box;
   border: 5px solid #1a6b3c;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.05) 45%, rgba(60,110,40,0.25) 100%),
-    url('../asset/backgrround_lp.png') no-repeat center center / cover,
-    radial-gradient(circle at top left, #c6f47a 0%, #7cb342 40%, #558b2f 100%);
+  background: #3d2a17;
   border-radius: 20px;
-  margin-bottom: 10px;
+  /* ketengah: kalau papan dibatasi tinggi layar, lebarnya lebih kecil
+     dari kartu pembungkus — tanpa ini papan menempel ke kiri */
+  margin: 0 auto 10px;
   overflow: hidden;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 12px 36px rgba(0,0,0,0.12);
 }
 
+.board-pic { display: block; }
+
+.board-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;      /* rasio kotak sudah sama, jadi tidak terpotong */
+  user-select: none;
+  z-index: 1;
+}
+
 .board {
-  position: relative;   /* petak diletakkan absolut mengikuti jalur meliuk */
+  position: absolute;   /* kotak petak diletakkan absolut di atas gambar */
+  inset: 0;
   width: 100%;
   height: 100%;
   z-index: 2;
 }
 
+/* Kotak petak sengaja transparan: angka & petaknya sudah tergambar di
+   ilustrasi. Kotak ini hanya penanda tempat pion berdiri. */
 .cell {
   position: absolute;
   transform: translate(-50%, -50%);   /* left/top = titik tengah petak */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
-  font-weight: 800;
-  font-size: clamp(11px, 1.05vw, 17px);
-  color: #5a3d16;
   box-sizing: border-box;
-  border-radius: 11px;
-  border: 2.5px solid #b07a35;
-  box-shadow: 0 3px 0 rgba(90,54,26,0.35), 0 5px 10px rgba(0,0,0,0.18);
+  border-radius: 8px;
   z-index: 2;
-  padding: 2px;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+  pointer-events: none;
 }
 
 /* Rule-rule warna & border sisa layout grid lama sudah dihapus —
@@ -435,53 +468,8 @@ body.fadein { opacity: 1; }
    di bawah, dan posisinya absolut mengikuti jalur. */
 /* START & FINISH digaya di bagian "Warna petak di jalur meliuk" di bawah */
 
-/* ---------- Board Overlay (Snakes & Ladders) ---------- */
-.overlay.trail {
-  z-index: 1;      /* di bawah petak */
-}
-
-.overlay {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 3;      /* ular & tangga di atas petak */
-}
-
-.overlay .ladder-rail {
-  fill: none;
-  stroke: #6d4c41;
-  stroke-width: 10;
-  stroke-linecap: round;
-  filter: drop-shadow(0 3px 2px rgba(65,42,20,0.24));
-}
-
-.overlay .ladder-rung {
-  fill: none;
-  stroke: #f5e7c6;
-  stroke-width: 8;
-  stroke-linecap: round;
-}
-
-.overlay .snake-body {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 4px 3px rgba(30,30,20,0.28));
-}
-
-.overlay .snake-highlight {
-  fill: none;
-  stroke: rgba(255,255,255,0.34);
-  stroke-width: 8;
-  stroke-linecap: round;
-  stroke-dasharray: 16 18;
-}
-
-.overlay .snake-head { stroke: rgba(55,32,18,0.24); stroke-width: 3; }
-.overlay .snake-eye { fill: #fff; stroke: #212121; stroke-width: 1; }
-.overlay .snake-pupil { fill: #111; }
-.overlay .snake-tongue { fill: none; stroke: #e53935; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+/* Blok .overlay lama (ular & tangga digambar pakai SVG) sudah dihapus:
+   papan sekarang berupa ilustrasi yang sudah memuat ular & tangganya. */
 
 /* ---------- Tokens ---------- */
 .token {
@@ -493,12 +481,45 @@ body.fadein { opacity: 1; }
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.35));
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
   transition: top 0.4s ease-out, left 0.4s ease-out;
   top: 290px;
   left: 10px;
   pointer-events: none;
   background: none;
+  transform-origin: 50% 100%;   /* melompat bertumpu di kaki */
+}
+
+/* Efek melangkah: tiap petak yang dilewati, pion melompat kecil lalu
+   mendarat dengan sedikit gepeng — dipasang per langkah dari JS. */
+@keyframes tokenStep {
+  0%   { transform: translateY(0)     scaleX(1)    scaleY(1); }
+  18%  { transform: translateY(-34%)  scaleX(0.93) scaleY(1.09); }
+  50%  { transform: translateY(-44%)  scaleX(1)    scaleY(1); }
+  82%  { transform: translateY(0)     scaleX(1.12) scaleY(0.88); }
+  100% { transform: translateY(0)     scaleX(1)    scaleY(1); }
+}
+
+.token.stepping {
+  animation: tokenStep 190ms cubic-bezier(0.33, 0, 0.4, 1);
+  z-index: 13;               /* pion yang sedang jalan selalu di atas */
+}
+
+/* Meluncur di ular / memanjat tangga: geraknya lebih panjang dan
+   sedikit berputar, biar beda rasanya dari melangkah biasa. */
+@keyframes tokenSlide {
+  0%   { transform: translateY(0) rotate(0deg)   scale(1); }
+  35%  { transform: translateY(-16%) rotate(-9deg) scale(1.1); }
+  100% { transform: translateY(0) rotate(0deg)   scale(1); }
+}
+
+.token.sliding {
+  animation: tokenSlide 480ms ease-in-out;
+  z-index: 13;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .token.stepping, .token.sliding { animation: none; }
 }
 
 /* ---------- Controls ---------- */
@@ -514,6 +535,144 @@ body.fadein { opacity: 1; }
   box-shadow: 0 8px 28px rgba(0,0,0,0.06);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+/* ============================================
+   MODE LAYAR PENUH — laptop/tablet mendatar
+   Papan mengisi layar (rasio tetap dijaga), sedangkan Papan Posisi,
+   waktu, dadu dan tombol jadi panel melayang di sudut layar. Di layar
+   yang lebih lebar dari rasio papan, panelnya jatuh di pinggir hitam
+   jadi tidak menutupi gambar sama sekali.
+   Ponsel & tampilan tegak tetap memakai susunan bertumpuk di atas.
+   ============================================ */
+@media (min-width: 900px) and (min-height: 520px) and (orientation: landscape) {
+  body {
+    padding: 0;
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+    justify-content: center;
+  }
+
+  .game-wrapper {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    /* pinggiran layar digelapkan supaya papan jadi pusat perhatian dan
+       tidak beradu dengan latar hutan terang milik halaman depan */
+    background: rgba(24, 15, 7, 0.6);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .board-container {
+    width: min(100vw, calc(100vh * var(--board-ratio)));
+    max-width: none;
+    margin: 0;
+    border-width: 0;
+    border-radius: 0;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.45);
+  }
+
+  /* ---- Zona bebas di kiri & kanan papan ----
+     Petak paling kiri berada di 29,6% lebar papan dan paling kanan di
+     89,6% (diukur dari CELL_POINTS). Jadi pinggir kiri <28% dan kanan
+     >91% cuma berisi pemandangan hutan — di situlah panel ditaruh
+     supaya tidak ada satu petak pun yang tertutup. */
+  .status-panel,
+  .controls {
+    --board-w: min(100vw, calc(100vh * var(--board-ratio)));
+    --gutter: calc((100vw - var(--board-w)) / 2);
+    --free-left: calc(var(--gutter) + var(--board-w) * 0.28);
+    --free-right: calc(var(--gutter) + var(--board-w) * 0.09);
+
+    position: fixed;
+    inset: 0;
+    display: block;          /* anak-anaknya diletakkan absolut per sudut */
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    z-index: 30;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    pointer-events: none;    /* klik tembus ke papan */
+  }
+  .status-panel > *,
+  .controls > * { pointer-events: auto; position: absolute; }
+
+  /* kiri atas: waktu lalu Papan Posisi (turun sedikit supaya lolos
+     tombol home & suara yang juga menempel di kiri atas) */
+  .timer-box {
+    top: 72px;
+    left: 14px;
+    width: max-content;
+    max-width: calc(var(--free-left) - 28px);
+  }
+  .scoreboard {
+    top: 124px;
+    left: 14px;
+    max-width: calc(var(--free-left) - 28px);
+  }
+
+  /* kiri bawah: keterangan giliran lalu dadu */
+  /* Ditumpuk di atas dadu. Tinggi dadu = nilai clamp + padding 2x10px +
+     border 2x3px (kotaknya content-box), lalu + 14px jarak bawah dadu
+     + 16px sela. Kalau ukuran dadu diubah, angka ini ikut disesuaikan. */
+  .info-panel {
+    left: 14px;
+    bottom: calc(clamp(74px, 11vh, 110px) + 64px);
+    margin: 0;
+    flex-grow: 0;
+    max-width: calc(var(--free-left) - 28px);
+    padding: 9px 14px;
+    border-radius: var(--game-radius);
+  }
+  /* bottom 22px: dadu punya bayangan tebal 8px di bawahnya, kalau cuma
+     14px bayangannya kepotong tepi layar dan dadunya terlihat terpangkas */
+  .dice-box { left: 14px; bottom: 22px; }
+
+  /* kanan bawah: Mulai Ulang */
+  .btn-reset {
+    right: 14px;
+    bottom: 14px;
+    max-width: calc(var(--free-right) - 28px);
+  }
+
+  /* kotak panel dibuat agak buram + bergaris supaya tetap terbaca
+     di atas ilustrasi hutan yang gelap */
+  .timer-box,
+  .scoreboard,
+  .info-panel {
+    background: rgba(255, 251, 238, 0.92);
+    border: 2px solid rgba(116, 68, 27, 0.4);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* dipadatkan supaya muat di pinggir kiri yang sempit */
+  #scoreboardList { gap: 4px; }
+  #scoreboardList.two-col { grid-template-columns: 1fr; gap: 4px; }
+  #scoreboardList.two-col .player-score { padding: 4px 8px; font-size: 12px; }
+  #scoreboardList.two-col .player-status { display: none; }
+  .scoreboard { padding: 8px 11px; min-width: 0; }
+  .scoreboard h3 { margin: 0 0 5px; font-size: 14px; }
+  .timer-box { padding: 8px 12px; font-size: 14px; min-width: 0; white-space: normal; }
+  .turn-text { font-size: 14px; }
+  #diceStatus { font-size: 12px; }
 }
 
 /* ---------- Dice ---------- */
@@ -1378,60 +1537,14 @@ body.fadein { opacity: 1; }
 }
 
 
-/* ---------- Warna petak di jalur meliuk ---------- */
-.cell.row-even {
-  background: linear-gradient(180deg, #fff6d6 0%, #ffe9a8 100%);
-}
-
-.cell.row-odd {
-  background: linear-gradient(180deg, #fff3c4 0%, #ffdf8e 100%);
-}
-
-.cell.start-cell {
-  background: linear-gradient(180deg, #a5d6a7 0%, #4caf50 100%);
-  border-color: #2e7d32;
-  color: #fff;
-  font-size: clamp(9px, 0.85vw, 13px);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
-}
-
-.cell.end-cell {
-  background: linear-gradient(180deg, #ffd54f 0%, #ef6c00 100%);
-  border-color: #c65100;
-  color: #fff;
-  font-size: clamp(9px, 0.85vw, 13px);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
-}
-
-
-/* ---------- Nomor petak: badge di sudut, tetap terbaca walau
-   ada badan ular / tangga melintas di atas petak ---------- */
-.cell { align-items: flex-start; justify-content: flex-start; padding: 0; }
-
-.cell-num {
-  position: absolute;
-  top: 2px;
-  left: 4px;
-  padding: 0 4px;
-  border-radius: 6px;
-  background: rgba(255, 253, 240, 0.88);
-  color: #5a3d16;
-  font-size: clamp(9px, 0.9vw, 14px);
-  font-weight: 800;
-  line-height: 1.35;
-  box-shadow: 0 1px 2px rgba(90, 54, 26, 0.25);
-}
-
-.cell-tag {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: clamp(8px, 0.8vw, 12px);
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+/* ---------- Petak papan bergambar ----------
+   Semua pewarnaan/nomor petak versi lama dihapus: papan sekarang berupa
+   ilustrasi, jadi petaknya tidak boleh ditimpa kotak berwarna lagi.
+   Yang tersisa hanya penanda halus untuk petak yang sedang ditempati. */
+.cell.cell-active {
+  box-shadow: 0 0 0 3px rgba(255, 241, 118, 0.95),
+              0 0 14px 4px rgba(255, 213, 79, 0.6);
+  background: rgba(255, 245, 157, 0.22);
 }
 
 
@@ -1679,6 +1792,13 @@ body.fadein { opacity: 1; }
   animation: zoomIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* Kedua artwork dipramuat lalu ditukar lewat kelas .fb-benar / .fb-salah,
+   jadi tidak ada kedip saat gambar berganti. Rasio tiap kartu berbeda,
+   karena itu tinggi kotaknya ikut gambar yang sedang tampil. */
+.fb-pic { display: block; }
+.fb-benar .fb-pic-salah,
+.fb-salah .fb-pic-benar { display: none; }
+
 .fb-art {
   display: block;
   width: 100%;
@@ -1687,42 +1807,77 @@ body.fadein { opacity: 1; }
   filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
 }
 
-/* Teks "<Nama> maju <n> langkah." — ditumpangkan tepat di area
-   subjudul pada artwork (koordinatnya diukur dari gambar). */
-.fb-sub {
+/* Teks bertumpuk pada artwork. Semua persen di bawah diukur langsung
+   dari kedua berkas kiriman klien:
+     BENAR  900x1093 : slot pesan top 72.23% h 13.94%, tombol y 86.87%
+     SALAH  900x1149 : slot pesan top 70.00% h 17.10%, tombol y 88.19%
+   Titik tengah kartu: BENAR 48.0%, SALAH 49.9%. */
+.fb-sub,
+.fb-msg {
   position: absolute;
-  left: 11.6%;
-  width: 79.5%;
-  top: 66.4%;
-  height: 15.7%;
   display: grid;
   place-items: center;
   text-align: center;
   font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
   font-weight: 800;
-  color: #23331a;
-  font-size: clamp(13px, 4.3vw, 19px);
-  line-height: 1.25;
+  line-height: 1.16;
+  text-wrap: balance;
   pointer-events: none;
 }
 
-.fb-salah .fb-sub { display: none; }   /* kartu SALAH: kalimatnya sudah di gambar */
+/* kartu BENAR — "<Nama> maju <n> langkah." (berubah tiap giliran) */
+.fb-sub {
+  left: 22.0%;
+  width: 52%;
+  top: 72.23%;
+  height: 13.94%;
+  color: #33421f;
+  font-size: clamp(12px, 4.2vw, 18px);
+}
 
-/* Area klik tepat di atas tombol yang tergambar */
+/* kartu SALAH — kalimat penyemangat (tetap, sesuai acuan klien) */
+.fb-msg {
+  left: 21.9%;
+  width: 56%;
+  top: 70.00%;
+  height: 17.10%;
+  color: #6b201a;
+  font-size: clamp(12px, 4.2vw, 18px);
+}
+
+.fb-salah .fb-sub,
+.fb-benar .fb-msg { display: none; }
+
+/* Area klik di atas tombol yang tergambar. Pada kartu BENAR tulisan
+   "Lanjutkan" sudah ada di artwork, sedangkan tombol kartu SALAH masih
+   kosong — jadi labelnya ditulis lewat HTML. */
 .fb-btn-hit {
   position: absolute;
-  left: 27.3%;
-  width: 45.4%;
-  top: 87.2%;
-  height: 11%;
+  display: grid;
+  place-items: center;
+  padding: 0;
   border: none;
   background: transparent;
-  border-radius: 16px;
+  border-radius: 14px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-.fb-salah .fb-btn-hit { left: 27.7%; width: 44.8%; }
+.fb-benar .fb-btn-hit { left: 26.66%; width: 42.73%; top: 86.87%; height: 12.67%; }
+.fb-salah .fb-btn-hit { left: 27.96%; width: 43.85%; top: 88.19%; height: 10.81%; }
+
+.fb-btn-label {
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-weight: 800;
+  color: #fff;
+  font-size: clamp(13px, 4.4vw, 19px);
+  line-height: 1;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 2px rgba(92, 16, 10, 0.55);
+  pointer-events: none;
+}
+
+.fb-benar .fb-btn-label { display: none; }   /* sudah tergambar di artwork */
 
 .fb-btn-hit:hover { filter: brightness(1.06); }
 .fb-btn-hit:active { transform: translateY(2px); }

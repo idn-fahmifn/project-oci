@@ -105,7 +105,9 @@ body.ready { opacity: 1; transition: opacity 0.6s var(--ease-out); }
 
 /* Floating header image */
 .hero-image {
-  width: clamp(200px, 38vw, 480px);
+  /* batas bawah 260px: judulnya kini dua baris, di bawah itu tulisan
+     "Ular Tangga" jadi terlalu kecil untuk dibaca di layar ponsel */
+  width: clamp(260px, 62vw, 480px);
   max-width: 90vw;
   height: auto;
   pointer-events: none;
@@ -1394,3 +1396,93 @@ body.ready { opacity: 1; transition: opacity 0.6s var(--ease-out); }
     gap: 10px;
   }
 }
+
+/* ============================================
+   RANGKA PAPAN KAYU UNTUK POP UP HALAMAN DEPAN
+
+   Menyamakan tampilan pop up di sini dengan pop up di halaman
+   permainan: papan kayu (asset/papan-kayu.*) sebagai border-image
+   9-irisan + kepala ular yang nongol di tepi atas.
+
+   Dipakai 9-irisan, bukan background yang dilebarkan, supaya keempat
+   sudut membulatnya tetap utuh berapa pun tinggi isi pop up.
+   ============================================ */
+.info-modal,
+.tujuan-modal,
+.rules-modal {
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 26px;
+  border-color: transparent;
+  border-radius: 24px;
+  border-image-source: url('../asset/papan-kayu.png');
+  border-image-source: image-set(
+    url('../asset/papan-kayu.webp') type('image/webp'),
+    url('../asset/papan-kayu.png') type('image/png'));
+  border-image-slice: 44 fill;
+  border-image-repeat: stretch;
+  background: none;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  /* Guliran dipindah ke lapisan luar: kalau kotaknya sendiri yang
+     overflow:auto, kepala ular yang menjulur ke atas ikut terpotong. */
+  max-height: none;
+  overflow: visible;
+  margin: auto;
+}
+
+/* Ruang untuk kepala ular yang menjulur 13,4% lebar papan ke bawah tepi
+   atas. Lebar pop upnya = min(100vw - 28px, max-width masing-masing),
+   karena lapisan luarnya berpadding 14px kiri-kanan. */
+.info-modal   { padding: calc(min(100vw - 28px, 520px) * 0.134 + 8px) 22px 24px; }
+.tujuan-modal { padding: calc(min(100vw - 28px, 480px) * 0.134 + 8px) 24px 24px; }
+.rules-modal  { padding: calc(min(100vw - 28px, 600px) * 0.134 + 8px) 8px 8px; }
+
+/* Ukuran & posisi kepala ular — penjelasan rumusnya ada di
+   css/ulartangga.css pada aturan .modal-simple::before */
+.info-modal::before,
+.tujuan-modal::before,
+.rules-modal::before {
+  content: "";
+  position: absolute;
+  left: calc((100% + 52px) * 0.39273 - 26px);
+  top: 0;
+  width: calc((100% + 52px) * 0.25251);
+  aspect-ratio: 479 / 480;
+  transform: translateY(-47.08%);
+  background: url('../asset/papan-ular.png') no-repeat center center / 100% 100%;
+  background-image: image-set(
+    url('../asset/papan-ular.webp') type('image/webp'),
+    url('../asset/papan-ular.png') type('image/png'));
+  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* lapisan luar yang menggulir; kotaknya dipusatkan pakai margin:auto
+   supaya isi yang lebih tinggi dari layar tidak terpangkas di atas */
+.info-modal-overlay,
+.tujuan-modal-overlay,
+.rules-modal-overlay {
+  align-items: flex-start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* padding atas 84px: kepala ular menjulur ~12% lebar papan ke atas
+     (maksimum ~72px), tanpa ruang ini kepalanya terpotong tepi layar
+     saat isi pop up lebih tinggi daripada layar. Pop up yang pendek
+     tetap terpusat karena kotaknya pakai margin:auto. */
+  padding: 84px 14px 30px;
+}
+
+/* tombol tutup digeser ke sudut papan, tidak tertutup bingkai */
+.info-modal .modal-close-btn,
+.tujuan-modal .modal-close-btn,
+.rules-modal .modal-close-btn {
+  top: -14px;
+  right: -12px;
+  z-index: 12;
+}
+
+/* Papannya sudah punya kepala ular sendiri, jadi maskot ular SVG di
+   dalam pop up dimatikan supaya tidak tampil dua ular sekaligus. */
+.info-modal .info-mascot,
+.tujuan-modal .tujuan-mascot { display: none; }

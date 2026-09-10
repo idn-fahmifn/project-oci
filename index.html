@@ -63,7 +63,12 @@
 
   <!-- Hero Section -->
   <main class="hero">
-    <img src="asset/template matematika.png" alt="Ular Tangga Matematika" class="hero-image" draggable="false">
+    <picture>
+      <!-- spasi pada nama berkas harus ditulis %20: di srcset, spasi
+           dipakai sebagai pemisah URL dan penanda ukuran -->
+      <source type="image/webp" srcset="asset/template%20matematika.webp">
+      <img src="asset/template matematika.png" alt="Ular Tangga Matematika" class="hero-image" width="1358" height="813" draggable="false">
+    </picture>
 
     <nav class="menu-stack">
       <a class="btn-start" id="startGameBtn" href="ulartangga.html">
@@ -148,7 +153,7 @@
         <div class="info-step-item">
           <div class="info-step-board">
             <span class="info-step-num">1</span>
-            <span class="info-step-text">Buka <strong>Materi</strong> dan tonton video penjelasan perkalian &amp; pembagian.</span>
+            <span class="info-step-text">Buka <strong>Materi</strong> lalu kerjakan latihan perkalian &amp; pembagiannya langsung.</span>
           </div>
         </div>
 
@@ -313,6 +318,7 @@
     <span>&copy; <span id="copyrightYear"></span> Rossy Fadhilah</span>
   </footer>
 
+  <script src="js/suara.js"></script>
   <script>
   (function() {
     'use strict';

@@ -123,11 +123,15 @@
       <div id="p1" class="token" style="padding:0"></div>
       <div id="p2" class="token" style="padding:0"></div>
       <div id="p3" class="token" style="padding:0"></div>
-      <!-- jalur meliuk (di bawah petak) -->
-      <svg class="overlay trail" id="trailOverlay" width="100%" height="100%" viewBox="0 0 760 540" preserveAspectRatio="none"></svg>
+      <!-- Ilustrasi papan: jalur, angka, ular dan tangga semuanya sudah
+           di gambar ini. Titik tengah tiap petak ada di CELL_POINTS. -->
+      <picture class="board-pic">
+        <source type="image/webp" srcset="asset/board-ular-tangga.webp">
+        <img class="board-img" src="asset/board-ular-tangga.jpg" width="2496" height="1696"
+             alt="Papan ular tangga bertema hutan, 46 petak" draggable="false">
+      </picture>
+      <!-- kotak penanda posisi pion (transparan) -->
       <div class="board" id="board"></div>
-      <!-- ular & tangga (di atas petak) -->
-      <svg class="overlay" id="pathOverlay" width="100%" height="100%" viewBox="0 0 760 540" preserveAspectRatio="none"></svg>
     </div>
 
     <!-- Controls -->
@@ -167,16 +171,39 @@
     </div>
   </div>
 
-  <!-- Feedback Modal — memakai artwork BENAR!/SALAH! dari dokumen klien
-       (asset/card-benar.png & card-salah.png). Teks "<Nama> maju <n> langkah."
-       ditumpangkan sebagai HTML supaya tetap dinamis. -->
+  <!-- Feedback Modal — memakai artwork BENAR!/SALAH! kiriman klien
+       (asset/card-benar.* & card-salah.*), tanpa diubah gambarnya.
+       Dua gambar dipramuat lalu ditukar lewat kelas .fb-benar/.fb-salah
+       supaya tidak berkedip. WebP dipakai lebih dulu, PNG jadi cadangan
+       untuk peramban lama.
+       Yang ditumpangkan sebagai HTML (bukan digambar ulang di aset):
+         - .fb-sub  : "<Nama> maju <n> langkah." pada kartu BENAR
+         - .fb-msg  : "Coba lagi, kamu pasti bisa!" pada kartu SALAH
+         - .fb-btn-label : tulisan "Coba Lagi", karena tombol pada
+                           artwork SALAH memang masih kosong
+       Tombol "Lanjutkan" kartu BENAR sudah tergambar, jadi tombolnya
+       cuma area klik transparan. Semua koordinat ada di ulartangga.css. -->
   <div id="successModal" class="modal-overlay" style="background:rgba(0,0,0,0.5)">
     <div class="fb-stack">
       <div class="feedback-card fb-benar" id="feedbackBox">
-        <img class="fb-art" id="fbArt" src="asset/card-benar.png" alt="" draggable="false">
+        <picture class="fb-pic fb-pic-benar">
+          <source type="image/webp" srcset="asset/card-benar.webp">
+          <img class="fb-art" src="asset/card-benar.png" width="900" height="1093"
+               alt="Jawabanmu benar!" draggable="false">
+        </picture>
+        <picture class="fb-pic fb-pic-salah">
+          <source type="image/webp" srcset="asset/card-salah.webp">
+          <img class="fb-art" src="asset/card-salah.png" width="900" height="1149"
+               alt="Jawabanmu belum tepat." draggable="false">
+        </picture>
+        <!-- kartu BENAR: pesan berubah tiap giliran -->
         <div class="fb-sub" id="resultFeedbackText"></div>
+        <!-- kartu SALAH: kalimat penyemangat sesuai acuan klien -->
+        <div class="fb-msg" aria-hidden="true">Coba lagi, kamu pasti bisa!</div>
         <button class="fb-btn-hit" id="feedbackBtn" type="button"
-                onclick="closeFeedback()" aria-label="Lanjutkan"></button>
+                onclick="closeFeedback()" aria-label="Lanjutkan">
+          <span class="fb-btn-label">Coba Lagi</span>
+        </button>
       </div>
       <div class="fb-note" id="feedbackNote"></div>
     </div>
@@ -329,28 +356,79 @@
     ];
     let usedQuestionIndices = [];
 
-    const boardRows = [
-      [29, 30, 31, 32, 33, 34, 35],
-      [28, 27, 26, 25, 24, 23, 22],
-      [15, 16, 17, 18, 19, 20, 21],
-      [14, 13, 12, 11, 10, 9, 8],
-      [1, 2, 3, 4, 5, 6, 7],
+    /* =========================================================
+       PAPAN ULAR TANGGA — asset/board-ular-tangga.*
+       Papan tidak lagi digambar lewat kode; seluruh jalur, angka,
+       ular dan tangga sudah ada di ilustrasinya. Yang disimpan di
+       sini hanya titik tengah tiap petak, dalam PERSEN dari ukuran
+       gambar (2496x1696), hasil pengukuran langsung dari gambar itu.
+       Kalau ilustrasinya diganti, cukup ukur ulang tabel ini.
+       Petak 1 = START, petak 3 = gambar pelampung (tanpa angka),
+       petak 46 = petak terakhir.
+       ========================================================= */
+    const BOARD_IMG_W = 2496, BOARD_IMG_H = 1696;   // rasio 1.4717
+    const CELL_POINTS = [
+      /*  1 */ [ 31.25,  92.33],   // START
+      /*  2 */ [ 36.62,  90.80],
+      /*  3 */ [ 42.31,  89.98],   // pelampung
+      /*  4 */ [ 48.32,  89.27],
+      /*  5 */ [ 53.85,  89.62],
+      /*  6 */ [ 59.70,  89.62],
+      /*  7 */ [ 65.06,  89.98],
+      /*  8 */ [ 70.83,  89.86],
+      /*  9 */ [ 76.68,  89.86],
+      /* 10 */ [ 82.05,  88.21],
+      /* 11 */ [ 85.74,  84.08],
+      /* 12 */ [ 86.86,  76.65],
+      /* 13 */ [ 84.46,  70.52],
+      /* 14 */ [ 79.73,  66.75],
+      /* 15 */ [ 75.88,  66.39],
+      /* 16 */ [ 69.63,  66.16],
+      /* 17 */ [ 63.54,  66.51],
+      /* 18 */ [ 58.57,  67.45],
+      /* 19 */ [ 52.48,  68.16],
+      /* 20 */ [ 46.31,  68.16],
+      /* 21 */ [ 40.22,  67.57],
+      /* 22 */ [ 35.34,  64.86],
+      /* 23 */ [ 32.37,  58.96],
+      /* 24 */ [ 33.01,  51.65],
+      /* 25 */ [ 37.42,  47.41],
+      /* 26 */ [ 43.27,  45.05],
+      /* 27 */ [ 49.44,  45.16],
+      /* 28 */ [ 55.13,  45.40],
+      /* 29 */ [ 60.42,  44.93],
+      /* 30 */ [ 65.30,  41.98],
+      /* 31 */ [ 67.31,  35.73],
+      /* 32 */ [ 65.30,  30.19],
+      /* 33 */ [ 60.10,  27.83],
+      /* 34 */ [ 55.29,  27.48],
+      /* 35 */ [ 50.48,  28.30],
+      /* 36 */ [ 45.91,  28.89],
+      /* 37 */ [ 40.06,  29.36],
+      /* 38 */ [ 36.06,  25.83],
+      /* 39 */ [ 34.86,  18.40],
+      /* 40 */ [ 38.06,  11.44],
+      /* 41 */ [ 43.51,   8.37],
+      /* 42 */ [ 49.68,   6.72],
+      /* 43 */ [ 55.29,   8.25],
+      /* 44 */ [ 60.66,   9.79],
+      /* 45 */ [ 66.19,  11.44],
+      /* 46 */ [ 71.07,  14.39],   // FINISH
     ];
 
+    // Tangga & ular diambil dari gambar: ujung-ujungnya sudah dicocokkan
+    // dengan tangga/ular yang tergambar, jadi pion bergerak sesuai gambar.
     const ladderAssets = [
-      { from: 3, to: 13 },
-      { from: 6, to: 17 },
-      { from: 10, to: 24 },
-      { from: 22, to: 32 },
+      { from: 15, to: 30 },
+      { from: 25, to: 37 },
+      { from: 33, to: 44 },
     ];
 
-    // 'bow' = seberapa melengkung badan ularnya; titik kontrol dihitung
-    // otomatis dari posisi petak, jadi ikut menyesuaikan kalau jalur berubah.
     const snakeAssets = [
-      { from: 34, to: 19, color: "#2e7d32", bow: 95 },
-      { from: 28, to: 12, color: "#3e2723", bow: -110 },
-      { from: 26, to: 15, color: "#00897b", bow: 80 },
-      { from: 20, to: 11, color: "#c62828", bow: -85 },
+      { from: 18, to: 4 },    // kobra jingga
+      { from: 27, to: 21 },   // ular ungu
+      { from: 35, to: 29 },   // ular merah
+      { from: 42, to: 36 },   // ular hijau
     ];
 
     const shortcuts = {};
@@ -361,7 +439,7 @@
       shortcuts[from] = { dest: to, type: "snake" };
     });
 
-    const endCell = 35;
+    const endCell = 46;
     const maxGameSeconds = 20 * 60;
 
     let activePlayers = [];
@@ -414,204 +492,28 @@
     }
 
     /* =========================================================
-       JALUR PAPAN — meliuk seperti ular, bukan kotak grid
-       (sesuai acuan di dokumen klien halaman 4)
+       JALUR PAPAN — mengikuti ilustrasi board-ular-tangga
 
-       Petak tetap 7 kolom x 5 baris dan nomornya tetap bolak-balik,
-       tapi tiap petak digeser naik-turun mengikuti gelombang sinus
-       sehingga jalurnya melengkung. Ujung baris (kolom 0 dan 6)
-       sengaja tanpa geseran supaya tikungan antar baris tetap rapi.
+       Posisi petak dibaca dari tabel CELL_POINTS (persen), jadi ikut
+       mengecil/membesar bersama gambar papannya tanpa perhitungan
+       tambahan. Ukuran kotak petak sedikit lebih besar dari petak
+       yang tergambar supaya empat pion masih lega di dalamnya.
        ========================================================= */
-    const VIEW_W = 760;
-    const VIEW_H = 540;
-    const BOARD_COLS = 7;
-    const BOARD_ROWS = 5;
-    const COL_STEP = VIEW_W / BOARD_COLS;
-    const ROW_STEP = VIEW_H / BOARD_ROWS;
-    const WAVE = 12;          // tinggi gelombang jalur
-
-    function cellRowCol(cellNum) {
-      for (let row = 0; row < boardRows.length; row++) {
-        const col = boardRows[row].indexOf(cellNum);
-        if (col !== -1) return { row: row, col: col };
-      }
-      return null;
-    }
+    const CELL_W_PCT = 5.5;    // lebar kotak petak, persen dari lebar papan
+    const CELL_H_PCT = 6.4;    // tinggi kotak petak, persen dari tinggi papan
 
     function getBoardPoint(cellNum) {
-      const rc = cellRowCol(cellNum);
-      if (!rc) return { x: COL_STEP / 2, y: VIEW_H - ROW_STEP / 2 };
-      const x = rc.col * COL_STEP + COL_STEP / 2;
-      // gelombang berbalik arah tiap baris -> jalurnya meliuk seperti ular
-      const dir = rc.row % 2 === 0 ? 1 : -1;
-      const wave = Math.sin((rc.col / (BOARD_COLS - 1)) * Math.PI * 2) * WAVE * dir;
-      const y = rc.row * ROW_STEP + ROW_STEP / 2 + wave;
-      return { x: x, y: y };
+      const p = CELL_POINTS[(cellNum | 0) - 1] || CELL_POINTS[0];
+      // dikembalikan dalam satuan piksel gambar asli, supaya pemanggil
+      // lama yang berpikir dalam koordinat gambar tetap jalan
+      return { x: p[0] / 100 * BOARD_IMG_W, y: p[1] / 100 * BOARD_IMG_H };
     }
 
-    /* Urutan petak 1..35 sebagai deretan titik, untuk menggambar jalurnya */
-    function boardPathPoints() {
-      const pts = [];
-      for (let n = 1; n <= endCell; n++) pts.push(getBoardPoint(n));
-      return pts;
-    }
 
-    function createSvgElement(tag, attrs = {}) {
-      const element = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        tag,
-      );
-      Object.entries(attrs).forEach(([key, value]) => {
-        element.setAttribute(key, value);
-      });
-      return element;
-    }
-
-    function drawLadder(svg, asset) {
-      const start = getBoardPoint(asset.from);
-      const end = getBoardPoint(asset.to);
-      const dx = end.x - start.x;
-      const dy = end.y - start.y;
-      const length = Math.hypot(dx, dy) || 1;
-      const offsetX = (-dy / length) * 13;
-      const offsetY = (dx / length) * 13;
-      const group = createSvgElement("g");
-      const railA = {
-        x1: start.x + offsetX,
-        y1: start.y + offsetY,
-        x2: end.x + offsetX,
-        y2: end.y + offsetY,
-      };
-      const railB = {
-        x1: start.x - offsetX,
-        y1: start.y - offsetY,
-        x2: end.x - offsetX,
-        y2: end.y - offsetY,
-      };
-
-      group.appendChild(
-        createSvgElement("line", { ...railA, class: "ladder-rail" }),
-      );
-      group.appendChild(
-        createSvgElement("line", { ...railB, class: "ladder-rail" }),
-      );
-
-      const rungCount = Math.max(3, Math.floor(length / 52));
-      for (let i = 1; i <= rungCount; i++) {
-        const t = i / (rungCount + 1);
-        const centerX = start.x + dx * t;
-        const centerY = start.y + dy * t;
-        group.appendChild(
-          createSvgElement("line", {
-            x1: centerX + offsetX,
-            y1: centerY + offsetY,
-            x2: centerX - offsetX,
-            y2: centerY - offsetY,
-            class: "ladder-rung",
-          }),
-        );
-      }
-
-      svg.appendChild(group);
-    }
-
-    function drawSnake(svg, asset) {
-      const start = getBoardPoint(asset.from);
-      const end = getBoardPoint(asset.to);
-      // busur badan ular dihitung tegak lurus garis start-end
-      const bow = typeof asset.bow === "number" ? asset.bow : 90;
-      const midX = (start.x + end.x) / 2;
-      const midY = (start.y + end.y) / 2;
-      const bdx = end.x - start.x;
-      const bdy = end.y - start.y;
-      const blen = Math.hypot(bdx, bdy) || 1;
-      const controlX = midX + (-bdy / blen) * bow;
-      const controlY = midY + (bdx / blen) * bow;
-      const pathD = `M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`;
-      const group = createSvgElement("g");
-
-      group.appendChild(
-        createSvgElement("path", {
-          d: pathD,
-          class: "snake-body",
-          stroke: asset.color,
-          "stroke-width": 24,
-        }),
-      );
-      group.appendChild(
-        createSvgElement("path", {
-          d: pathD,
-          class: "snake-highlight",
-        }),
-      );
-      group.appendChild(
-        createSvgElement("circle", {
-          cx: end.x,
-          cy: end.y,
-          r: 9,
-          fill: asset.color,
-          opacity: 0.9,
-        }),
-      );
-      group.appendChild(
-        createSvgElement("ellipse", {
-          cx: start.x,
-          cy: start.y,
-          rx: 19,
-          ry: 16,
-          fill: asset.color,
-          class: "snake-head",
-        }),
-      );
-      group.appendChild(
-        createSvgElement("circle", {
-          cx: start.x - 7,
-          cy: start.y - 5,
-          r: 5,
-          class: "snake-eye",
-        }),
-      );
-      group.appendChild(
-        createSvgElement("circle", {
-          cx: start.x + 7,
-          cy: start.y - 5,
-          r: 5,
-          class: "snake-eye",
-        }),
-      );
-      group.appendChild(
-        createSvgElement("circle", {
-          cx: start.x - 7,
-          cy: start.y - 5,
-          r: 2,
-          class: "snake-pupil",
-        }),
-      );
-      group.appendChild(
-        createSvgElement("circle", {
-          cx: start.x + 7,
-          cy: start.y - 5,
-          r: 2,
-          class: "snake-pupil",
-        }),
-      );
-      group.appendChild(
-        createSvgElement("path", {
-          d: `M ${start.x} ${start.y + 14} L ${start.x} ${start.y + 27} M ${start.x} ${start.y + 27} L ${start.x - 8} ${start.y + 35} M ${start.x} ${start.y + 27} L ${start.x + 8} ${start.y + 35}`,
-          class: "snake-tongue",
-        }),
-      );
-
-      svg.appendChild(group);
-    }
-
-    function renderBoardAssets() {
-      const pathOverlay = $("pathOverlay");
-      if (!pathOverlay) return;
-      pathOverlay.innerHTML = "";
-      ladderAssets.forEach((asset) => drawLadder(pathOverlay, asset));
-      snakeAssets.forEach((asset) => drawSnake(pathOverlay, asset));
-    }
+    /* Ular & tangga sudah ada di ilustrasi papan, jadi tidak digambar
+       lagi lewat SVG. Fungsinya disisakan kosong supaya pemanggilan
+       dari tempat lain tidak error. */
+    function renderBoardAssets() {}
 
     function formatTime(seconds) {
       const minutes = Math.floor(seconds / 60);
@@ -621,70 +523,29 @@
 
     function initBoard() {
       board.innerHTML = "";
-      // Petak hampir berhimpit menyamping supaya tiap baris terbaca sebagai
-      // satu pita jalur; jarak antar baris dilebarkan supaya pemandangan
-      // di belakangnya kelihatan — seperti acuan di dokumen klien.
-      const tileW = COL_STEP * 0.97;
-      const tileH = ROW_STEP * 0.56;
-
+      // Petak dibuat transparan — angka, jalur, ular dan tangganya sudah
+      // tergambar di ilustrasi papan. Kotak ini cuma penanda posisi pion.
       for (let num = 1; num <= endCell; num++) {
-        const rc = cellRowCol(num);
-        const pt = getBoardPoint(num);
+        const p = CELL_POINTS[num - 1];
         const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.classList.add(rc && rc.row % 2 === 0 ? "row-even" : "row-odd");
+        cell.className = "cell";
         cell.id = `cell-${num}`;
         if (num === 1) cell.classList.add("start-cell");
         if (num === endCell) cell.classList.add("end-cell");
-        if (num === 1) cell.innerHTML = '<span class="cell-tag">START</span>';
-        else if (num === endCell) cell.innerHTML = '<span class="cell-tag">FINISH</span>';
-        else cell.innerHTML = '<span class="cell-num">' + num + '</span>';
-
-        // posisi dalam persen -> ikut mengecil bersama papan
-        cell.style.left = (pt.x / VIEW_W * 100) + "%";
-        cell.style.top = (pt.y / VIEW_H * 100) + "%";
-        cell.style.width = (tileW / VIEW_W * 100) + "%";
-        cell.style.height = (tileH / VIEW_H * 100) + "%";
+        cell.style.left = p[0] + "%";
+        cell.style.top = p[1] + "%";
+        cell.style.width = CELL_W_PCT + "%";
+        cell.style.height = CELL_H_PCT + "%";
         board.appendChild(cell);
       }
-
-      renderTrail();
-      renderBoardAssets();
       updateAllPlayerPositions();
     }
 
-    /* Jalur tebal membelok di bawah petak — ini yang bikin papannya
-       terbaca sebagai lintasan meliuk, bukan kumpulan kotak. */
-    function renderTrail() {
-      const trail = $("trailOverlay");
-      if (!trail) return;
-      trail.innerHTML = "";
-      const pts = boardPathPoints();
-      const d = pts.map(function (p, i) {
-        return (i === 0 ? "M" : "L") + p.x.toFixed(1) + " " + p.y.toFixed(1);
-      }).join(" ");
-
-      // tiga lapis: tepi gelap, badan jalur, sorotan tipis di atas
-      [
-        { w: ROW_STEP * 0.44, c: "rgba(74,45,15,0.45)" },  // tepi
-        { w: ROW_STEP * 0.34, c: "#c98f4b" },              // badan jalur (tanah)
-        { w: ROW_STEP * 0.11, c: "rgba(255,240,200,0.4)" }  // sorotan
-      ].forEach(function (layer) {
-        trail.appendChild(createSvgElement("path", {
-          d: d,
-          fill: "none",
-          stroke: layer.c,
-          "stroke-width": layer.w,
-          "stroke-linecap": "round",
-          "stroke-linejoin": "round"
-        }));
-      });
-    }
-
-    /* renderWindingPath() lama (panah putus-putus antar baris) sudah
-       digantikan renderTrail(); disisakan sebagai no-op supaya pemanggilan
-       lain tidak error. */
-    function renderWindingPath() { renderTrail(); }
+    /* Jalur papan sudah tergambar di ilustrasinya, jadi kedua fungsi
+       penggambar lama ini dikosongkan (masih dipanggil dari beberapa
+       tempat, biar tidak error). */
+    function renderTrail() {}
+    function renderWindingPath() {}
 
     function initGamePlayers(count) {
       activePlayers = [];
@@ -737,30 +598,59 @@
       });
     }
 
-    function moveTokenVisual(playerId, cellNum, animate = true) {
+    /* Ukuran pion dibuat sebesar yang petaknya izinkan: kalau sendirian di
+       petak, ikon hewannya mengisi hampir seluruh petak. Petak baru dibagi
+       kalau memang ada pion lain di sana — dulu selalu dibagi 2x2 sehingga
+       ikonnya kekecilan padahal biasanya pemain ada di petak berbeda. */
+    function moveTokenVisual(playerId, cellNum, animate = true, stepMs = 0) {
       const token = document.getElementById(`p${playerId}`);
       const targetCell = document.getElementById(`cell-${cellNum}`);
       if (!targetCell || !token) return;
 
-      // Ukuran & posisi pion dihitung dari ukuran petak, bukan angka px tetap,
-      // supaya tetap pas walau papannya menyusut di layar kecil / pendek.
       const cw = targetCell.offsetWidth;
       const ch = targetCell.offsetHeight;
-      const size = Math.max(16, Math.round(Math.min(cw, ch) * 0.42));
+
+      // siapa saja yang sedang berdiri di petak ini
+      const sharing = activePlayers
+        .filter((p) => p.pos === cellNum)
+        .map((p) => p.id);
+      const list = sharing.includes(playerId) ? sharing : [playerId];
+      const count = list.length;
+      const slot = Math.max(0, list.indexOf(playerId));
+
+      const cols = count <= 1 ? 1 : 2;
+      const rows = count <= 2 ? 1 : 2;
+      const slotW = cw / cols;
+      const slotH = ch / rows;
+      const fill = count <= 1 ? 1 : 0.94;
+      const size = Math.max(14, Math.round(Math.min(slotW, slotH) * fill));
+
       token.style.width = `${size}px`;
       token.style.height = `${size}px`;
 
-      // Empat pion disusun 2x2 di dalam petak, masing-masing ketengah di kuadrannya
-      const col = playerId % 2;
-      const row = Math.floor(playerId / 2);
-      const left = targetCell.offsetLeft + (cw / 2) * col + (cw / 2 - size) / 2;
-      const top = targetCell.offsetTop + (ch / 2) * row + (ch / 2 - size) / 2;
+      const left =
+        targetCell.offsetLeft + slotW * (slot % cols) + (slotW - size) / 2;
+      const top =
+        targetCell.offsetTop + slotH * Math.floor(slot / cols) + (slotH - size) / 2;
 
       if (!animate) token.style.transition = "none";
-      else token.style.transition = "top 0.4s ease-out, left 0.4s ease-out";
+      else if (stepMs) {
+        token.style.transition =
+          `top ${stepMs}ms ease-in-out, left ${stepMs}ms ease-in-out`;
+      } else token.style.transition = "top 0.4s ease-out, left 0.4s ease-out";
 
       token.style.left = `${Math.round(left)}px`;
       token.style.top = `${Math.round(top)}px`;
+    }
+
+    /* Memutar ulang animasi kelas yang sama butuh reflow di tengahnya,
+       kalau tidak browser menganggapnya animasi yang masih berjalan. */
+    function playTokenEffect(playerId, className) {
+      const token = document.getElementById(`p${playerId}`);
+      if (!token) return;
+      token.classList.remove("stepping", "sliding");
+      void token.offsetWidth;
+      token.classList.add(className);
     }
 
     /* =========================================================
@@ -944,6 +834,10 @@
     }
 
     function finalizeStartOrder() {
+      // Kalau pemain menekan "Mulai Ulang" saat penentuan urutan masih
+      // berjalan, daftar pemain sudah dikosongkan tapi timer fungsi ini
+      // masih menyala. Tanpa penjagaan ini permainan berhenti dengan error.
+      if (!activePlayers.length) return;
       activePlayers.sort((a, b) => b.roll - a.roll || a.index - b.index);
       turnIndex = 0;
       hideModal("startOrderModal");
@@ -1072,10 +966,11 @@
     function getQuestionByPosition(position) {
       // Determine difficulty range based on position
       let startIdx, endIdx;
-      // Pembagian level mengikuti dokumen klien: 15 mudah, 20 sedang, 15 sulit
-      if (position <= 12) {
+      // Pembagian level mengikuti dokumen klien: 15 mudah, 20 sedang, 15 sulit.
+      // Batasnya menyesuaikan papan 46 petak (kira-kira sepertiga jalur).
+      if (position <= 16) {
         startIdx = 0; endIdx = 15;        // LEVEL MUDAH (soal 1-15)
-      } else if (position <= 24) {
+      } else if (position <= 32) {
         startIdx = 15; endIdx = 35;       // LEVEL SEDANG (soal 16-35)
       } else {
         startIdx = 35; endIdx = 50;       // LEVEL SULIT (soal 36-50)
@@ -1111,13 +1006,47 @@
       handleQuizResult(success);
     }
 
+    /* Pion melangkah petak demi petak dengan lompatan kecil tiap langkah,
+       jadi anak bisa ikut menghitung majunya berapa. Petak yang sedang
+       dipijak ikut disorot sebentar. */
+    const STEP_MS = 200;
+
     async function animatePlayerMovement(player, targetPosition) {
       const step = targetPosition > player.pos ? 1 : -1;
       while (player.pos !== targetPosition) {
+        const prev = player.pos;
         player.pos += step;
-        moveTokenVisual(player.id, player.pos, true);
-        await sleep(180);
+        moveTokenVisual(player.id, player.pos, true, STEP_MS - 30);
+        playTokenEffect(player.id, "stepping");
+        highlightCell(player.pos);
+        // pion lain di petak asal & tujuan ikut dirapikan susunannya
+        refreshTokensOn([prev, player.pos], player.id);
+        await sleep(STEP_MS);
       }
+      clearCellHighlight();
+    }
+
+    let highlightTimer = null;
+    function highlightCell(cellNum) {
+      clearCellHighlight();
+      const cell = document.getElementById(`cell-${cellNum}`);
+      if (cell) cell.classList.add("cell-active");
+    }
+
+    function clearCellHighlight() {
+      clearTimeout(highlightTimer);
+      document
+        .querySelectorAll(".cell.cell-active")
+        .forEach((c) => c.classList.remove("cell-active"));
+    }
+
+    /* Kalau ada pion yang meninggalkan / memasuki sebuah petak, pion lain
+       di petak itu perlu diatur ulang supaya ukurannya kembali pas. */
+    function refreshTokensOn(cells, exceptId) {
+      activePlayers.forEach((p) => {
+        if (p.id === exceptId) return;
+        if (cells.indexOf(p.pos) !== -1) moveTokenVisual(p.id, p.pos, false);
+      });
     }
 
     let feedbackResolve = null;
@@ -1125,13 +1054,12 @@
     function showFeedback(success, message, note) {
       if (!feedbackModal) return;
       const box  = document.getElementById("feedbackBox");
-      const art  = document.getElementById("fbArt");
       const sub  = document.getElementById("resultFeedbackText");
       const btn  = document.getElementById("feedbackBtn");
       const noteEl = document.getElementById("feedbackNote");
 
-      // Artwork sesuai hasil jawaban
-      art.src = success ? "asset/card-benar.png" : "asset/card-salah.png";
+      // Artwork sesuai hasil jawaban — cukup tukar kelas, kedua gambar
+      // sudah dipramuat sehingga tidak ada kedip.
       box.className = "feedback-card " + (success ? "fb-benar" : "fb-salah");
       btn.setAttribute("aria-label", success ? "Lanjutkan" : "Coba Lagi");
 
@@ -1164,9 +1092,16 @@
         await animatePlayerMovement(player, targetPosition);
         const shortcut = shortcuts[player.pos];
         if (shortcut) {
-          await sleep(300);
+          await sleep(320);
+          const from = player.pos;
           player.pos = shortcut.dest;
+          // meluncur di ular / memanjat tangga: gerak panjang, bukan melangkah
           moveTokenVisual(player.id, player.pos, true);
+          playTokenEffect(player.id, "sliding");
+          highlightCell(player.pos);
+          refreshTokensOn([from, player.pos], player.id);
+          await sleep(520);
+          clearCellHighlight();
         }
       }
       renderScoreboard();
