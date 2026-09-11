@@ -1,0 +1,530 @@
+/* ============================================
+   ABOUT-US.CSS — About Me / Profile Page
+   ============================================ */
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(145deg, #e8f5e9 0%, #f1f8e9 40%, #fffde7 100%);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+}
+
+body.ready { opacity: 1; }
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url('../gambar/latar-beranda.png') no-repeat center center / cover;
+  opacity: 0.08;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Layout shell */
+.about-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1080px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 80px 0 48px;
+}
+
+/* Profile Hero Section */
+.profile-hero {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 48px;
+}
+
+.profile-image-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* Bingkai ranting + foto (SVG) */
+.profile-frame {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  display: block;
+  overflow: visible;
+  animation: float-gentle 3.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 12px 26px rgba(60, 40, 15, 0.28));
+}
+
+.profile-frame .frame-bird {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: bird-peck 4.5s ease-in-out infinite;
+}
+
+@keyframes bird-peck {
+  0%, 62%, 100% { transform: rotate(0deg); }
+  70% { transform: rotate(-9deg); }
+  78% { transform: rotate(3deg); }
+  86% { transform: rotate(-4deg); }
+}
+
+/* Aturan lama untuk <img> — disisakan kalau nanti fotonya dikembalikan ke gambar */
+.profile-image {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  border-radius: var(--radius-xl);
+  animation: float-gentle 3.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes float-gentle {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-18px); }
+}
+
+/* Bio Card */
+.bio-card {
+  background: var(--surface-card);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 32px 36px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.bio-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3vw, 1.55rem);
+  font-weight: 800;
+  color: var(--color-forest);
+  margin: 0 0 12px;
+}
+
+.bio-closing {
+  font-weight: 800;
+  color: var(--color-forest);
+}
+
+.bio-card p {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  line-height: 1.85;
+  margin: 0;
+}
+
+.bio-card p + p {
+  margin-top: 16px;
+}
+
+.bio-card strong {
+  color: var(--color-forest);
+  font-weight: 700;
+}
+
+/* MY LITTLE BELIEF Section */
+.belief-section {
+  margin-bottom: 36px;
+}
+
+.belief-card {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 36px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(26,107,60,0.06) 0%, rgba(76,175,80,0.08) 50%, rgba(249,168,37,0.06) 100%);
+  border: 1px solid rgba(76,175,80,0.15);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.belief-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.belief-icon svg {
+  width: 32px;
+  height: 32px;
+  color: var(--color-gold);
+  opacity: 0.7;
+}
+
+.belief-title {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: 800;
+  color: var(--color-forest);
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+
+.belief-quote {
+  font-size: 0.95rem;
+  line-height: 1.85;
+  color: var(--color-text);
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Interests Section */
+.interests-section {
+  text-align: center;
+  margin-top: 12px;
+}
+
+.interests-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-glass-strong);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: 800;
+  color: var(--color-forest);
+  margin-bottom: 20px;
+}
+
+.interests-desc {
+  max-width: 680px;
+  margin: 0 auto 28px;
+  padding: 20px 24px;
+  background: var(--surface-card);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  font-style: italic;
+}
+
+.interests-tagline {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  background: var(--color-gold-pale);
+  color: var(--color-wood);
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 28px;
+  animation: float-tag 2.4s ease-in-out infinite;
+}
+
+@keyframes float-tag {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Interest Cards Grid */
+.interest-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.interest-card {
+  background: var(--surface-card);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 20px 15px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  transition: all var(--duration-normal) var(--ease-out);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.interest-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+.interest-card img {
+  width: clamp(84px, 9vw, 116px);
+  height: clamp(84px, 9vw, 116px);
+  object-fit: contain;
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+/* Deskripsi tiap hobi — teksnya dari dokumen klien */
+.interest-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.interest-card:hover img {
+  transform: scale(1.08);
+}
+
+.interest-card .interest-label {
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  background: var(--color-gold-pale);
+  color: var(--color-amber);
+  font-weight: 800;
+  font-size: 0.84rem;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .about-shell {
+    padding-top: 64px;
+  }
+
+  .profile-hero {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .profile-image, .profile-frame {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .bio-card {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 740px) {
+  .interest-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .interest-card {
+    padding: 18px 10px;
+  }
+
+  .interest-card img {
+    width: 74px;
+    height: 74px;
+  }
+
+  .belief-card {
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-shell {
+    padding-top: 56px;
+    width: min(100vw - 20px, 1080px);
+  }
+
+  .profile-image, .profile-frame {
+    max-width: 240px;
+  }
+
+  .bio-card {
+    padding: 20px 18px;
+  }
+
+  .bio-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3vw, 1.55rem);
+  font-weight: 800;
+  color: var(--color-forest);
+  margin: 0 0 12px;
+}
+
+.bio-closing {
+  font-weight: 800;
+  color: var(--color-forest);
+}
+
+.bio-card p {
+    font-size: 0.9rem;
+  }
+
+  .interest-grid {
+    gap: 10px;
+  }
+
+  .interest-card img {
+    width: 62px;
+    height: 62px;
+  }
+
+  .interest-desc { font-size: 0.78rem; }
+
+  .interest-card .interest-label {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+}
+
+/* ============================================
+   SOSIAL MEDIA
+
+   Tiga kartu tautan ke LinkedIn, Instagram, dan TikTok. Warna khas
+   tiap platform dikirim dari HTML lewat variabel --aksen, jadi
+   menambah platform baru cukup menyalin satu kartu dan mengganti
+   satu warna — tidak perlu aturan CSS baru per platform.
+   ============================================ */
+.sosmed-section {
+  text-align: center;
+  margin-top: 34px;
+}
+
+.sosmed-desc {
+  max-width: 680px;
+  margin: 0 auto 24px;
+  padding: 18px 24px;
+  background: var(--surface-card);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.75;
+  font-style: italic;
+}
+
+/* Dua kolom, bukan empat: alamat emailnya panjang dan butuh ruang
+   supaya tidak terpangkas jadi "rossyfadhilahir@gmai…". */
+.sosmed-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.sosmed-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 16px;
+  text-align: left;
+  text-decoration: none;
+  background: var(--surface-card);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out),
+              border-color var(--duration-normal) var(--ease-out);
+}
+
+.sosmed-card:hover,
+.sosmed-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--aksen, var(--color-forest));
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.14);
+  outline: none;
+}
+
+.sosmed-card:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9),
+              0 0 0 6px var(--aksen, var(--color-forest));
+}
+
+/* Logo resminya sudah berbentuk lingkaran berlatar transparan, jadi
+   wadahnya dibiarkan bening. Bayangan + garis tepi tipis tetap dipasang
+   supaya logo Gmail — yang lingkarannya putih — tidak lenyap di atas
+   kartu yang juga putih. */
+.sosmed-ikon {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 11px rgba(0, 0, 0, 0.16),
+              0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.sosmed-ikon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+}
+
+.sosmed-teks {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;          /* supaya nama akun yang panjang boleh dipangkas */
+  flex: 1 1 auto;
+}
+
+.sosmed-nama {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--color-forest);
+  line-height: 1.25;
+}
+
+.sosmed-akun {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sosmed-panah {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  color: var(--aksen, var(--color-forest));
+  opacity: 0.55;
+  transition: transform var(--duration-normal) var(--ease-out),
+              opacity var(--duration-normal) var(--ease-out);
+}
+
+.sosmed-card:hover .sosmed-panah,
+.sosmed-card:focus-visible .sosmed-panah {
+  opacity: 1;
+  transform: translate(2px, -2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sosmed-card,
+  .sosmed-panah { transition: none; }
+  .sosmed-card:hover,
+  .sosmed-card:focus-visible { transform: none; }
+}
+
+@media (max-width: 640px) {
+  .sosmed-grid { grid-template-columns: 1fr; max-width: 420px; }
+  .sosmed-card { padding: 13px 14px; }
+  .sosmed-ikon { width: 44px; height: 44px; }
+  .sosmed-nama { font-size: 0.95rem; }
+  .sosmed-akun { font-size: 0.78rem; }
+  .sosmed-desc { font-size: 0.88rem; padding: 15px 18px; }
+}

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latihan Pembagian</title>
+  <meta name="description" content="Latihan pembagian interaktif — siswa membagi, menebak pasangan, dan mengerjakan porogapit sendiri.">
+  <link rel="icon" href="../gambar/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/materi-latihan.css">
+</head>
+<body>
+  <main class="latihan-shell">
+    <div class="latihan-topbar">
+      <a href="materi-page.html" class="back-link">&larr; Kembali ke Materi</a>
+      <div class="latihan-title">Pembagian &#247;</div>
+    </div>
+
+    <div class="level-bar" id="levelBar"></div>
+    <div class="activity-board" id="activityBoard"></div>
+  </main>
+
+  <script src="../js/suara.js"></script>
+  <script src="../js/latihan-core.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    var L = Latihan, el = L.el;
+
+    /* =========================================================
+       LEVEL 1 — BAGI RATA
+       Siswa memindahkan sendiri benda ke wadah sampai sama rata.
+       ========================================================= */
+    var BAGI_SOAL = [
+      { total: 12, groups: 3, item: '🍬', wadah: 'anak',    icon: '🧒', isi: 'permen' },
+      { total: 15, groups: 5, item: '🍎', wadah: 'keranjang', icon: '🧺', isi: 'apel' },
+      { total: 12, groups: 4, item: '🍪', wadah: 'piring',  icon: '🍽️', isi: 'kue' },
+      { total: 18, groups: 3, item: '🥕', wadah: 'kelinci', icon: '🐰', isi: 'wortel' },
+      { total: 16, groups: 4, item: '🐟', wadah: 'kucing',  icon: '🐱', isi: 'ikan' }
+    ];
+
+    function buildBagiRata(host, api) {
+      var s = api.soal(BAGI_SOAL);
+      var perGroup = s.total / s.groups;
+      var pool = s.total;
+      var baskets = [];
+      var solved = false;
+
+      for (var i = 0; i < s.groups; i++) baskets.push(0);
+
+      var task = el('div', 'paper');
+      var t = el('div', 'task-text');
+      t.innerHTML = 'Ada <strong>' + s.total + ' ' + s.isi + '</strong> yang harus dibagi ' +
+        '<strong>sama rata</strong> ke <strong>' + s.groups + ' ' + s.wadah + '</strong>.<br>' +
+        'Pencet ' + s.wadah + '-nya untuk memberi satu ' + s.isi + '. Bagi sampai habis ya!';
+      task.appendChild(t);
+
+      var poolBox = el('div', 'pool');
+      var basketRow = el('div', 'basket-row');
+      basketRow.style.gridTemplateColumns = 'repeat(' + Math.min(s.groups, 5) + ', 1fr)';
+      var hint = el('div', 'basket-hint');
+      var answerHost = el('div', 'paper');
+      answerHost.style.display = 'none';
+
+      var basketEls = [];
+
+      function drawPool() {
+        poolBox.innerHTML = '';
+        poolBox.appendChild(el('div', 'pool-label',
+          'Sisa ' + s.isi + ': ' + pool + ' buah'));
+        for (var i = 0; i < pool; i++) poolBox.appendChild(el('span', 'pool-item', s.item));
+        if (pool === 0) poolBox.appendChild(el('span', 'array-empty', s.isi + ' sudah habis dibagi'));
+      }
+
+      function drawBaskets() {
+        basketEls.forEach(function (b, i) {
+          b.items.innerHTML = '';
+          for (var k = 0; k < baskets[i]; k++) {
+            b.items.appendChild(el('span', null, s.item));
+          }
+          b.count.textContent = baskets[i] + ' ' + s.isi;
+          b.node.classList.toggle('full-eq', baskets[i] === perGroup);
+          b.undo.disabled = baskets[i] === 0;
+        });
+      }
+
+      function checkState() {
+        drawPool();
+        drawBaskets();
+        if (solved) return;
+
+        if (pool > 0) {
+          hint.textContent = 'Pencet ' + s.wadah + ' untuk memberi satu ' + s.isi +
+            '. Pencet tombol − kalau mau mengambil kembali.';
+          api.clearMsg();
+          return;
+        }
+
+        // pool habis — apakah sudah sama rata?
+        var equal = baskets.every(function (n) { return n === baskets[0]; });
+        if (equal) {
+          solved = true;
+          hint.textContent = '';
+          api.ok('Sudah sama rata! Setiap ' + s.wadah + ' dapat ' + baskets[0] + ' ' + s.isi + '.');
+          showAnswer();
+        } else {
+          var min = Math.min.apply(null, baskets), max = Math.max.apply(null, baskets);
+          api.no(s.isi.charAt(0).toUpperCase() + s.isi.slice(1) + '-nya sudah habis, tapi belum sama rata! ' +
+            'Ada yang dapat ' + min + ', ada yang dapat ' + max + '. Ambil kembali lalu bagi ulang.');
+          hint.textContent = 'Pencet tombol − untuk mengambil kembali, lalu bagi ulang.';
+        }
+      }
+
+      for (var g = 0; g < s.groups; g++) {
+        (function (gi) {
+          var node = el('div', 'basket');
+          node.appendChild(el('div', 'basket-icon', s.icon));
+          var items = el('div', 'basket-items');
+          node.appendChild(items);
+          var count = el('div', 'basket-count', '0 ' + s.isi);
+          node.appendChild(count);
+
+          // tombol ambil kembali — dipisah supaya klik menambah tidak pernah salah sasaran
+          var undo = el('button', 'basket-undo', '−');
+          undo.type = 'button';
+          undo.title = 'Ambil kembali satu ' + s.isi;
+          undo.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (solved || baskets[gi] === 0) return;
+            baskets[gi]--; pool++; checkState();
+          });
+          node.appendChild(undo);
+
+          node.addEventListener('click', function () {
+            if (solved) return;
+            if (pool > 0) { baskets[gi]++; pool--; checkState(); }
+          });
+
+          basketEls.push({ node: node, items: items, count: count, undo: undo });
+          basketRow.appendChild(node);
+        })(g);
+      }
+
+      function showAnswer() {
+        answerHost.style.display = '';
+        answerHost.innerHTML = '';
+        var q = el('div', 'task-text');
+        q.innerHTML = '<strong>' + s.total + '</strong> ' + s.isi + ' dibagi ke <strong>' +
+          s.groups + '</strong> ' + s.wadah + '.<br>Tulis hasil pembagiannya: <strong>' +
+          s.total + ' : ' + s.groups + ' = ?</strong>';
+        answerHost.appendChild(q);
+
+        L.answerRow(answerHost, {
+          onSubmit: function (v) {
+            if (v === perGroup) {
+              api.win('Benar! ' + s.total + ' : ' + s.groups + ' = ' + perGroup +
+                '. Membagi itu artinya membagi sama rata.');
+              return true;
+            }
+            api.no('Belum tepat. Lihat lagi ' + s.wadah + '-nya — satu ' + s.wadah +
+              ' isinya berapa ' + s.isi + '?');
+            return false;
+          }
+        });
+      }
+
+      host.appendChild(task);
+      task.appendChild(poolBox);
+      task.appendChild(basketRow);
+      task.appendChild(hint);
+      host.appendChild(answerHost);
+      checkState();
+    }
+
+    /* =========================================================
+       LEVEL 2 — TEBAK PASANGAN
+       Pembagian = mencari pengali yang hilang.
+       ========================================================= */
+    var PASANGAN_SOAL = [
+      { total: 15, div: 3 }, { total: 24, div: 4 }, { total: 18, div: 6 },
+      { total: 28, div: 7 }, { total: 30, div: 5 }, { total: 21, div: 3 },
+      { total: 36, div: 4 }, { total: 40, div: 8 }
+    ];
+
+    function buildPasangan(host, api) {
+      var s = api.soal(PASANGAN_SOAL);
+      var answer = s.total / s.div;
+
+      var task = el('div', 'paper');
+      var t = el('div', 'task-text');
+      t.innerHTML = 'Berapa <strong>' + s.total + ' : ' + s.div + '</strong> ?<br>' +
+        'Caranya: cari angka yang kalau dikali <strong>' + s.div +
+        '</strong> hasilnya <strong>' + s.total + '</strong>.';
+      task.appendChild(t);
+
+      var eq = el('div', 'step-prompt');
+      eq.innerHTML = '<b style="font-size:1.5rem">' + s.div + ' × <span class="hl">?</span> = ' +
+        s.total + '</b>';
+      task.appendChild(eq);
+
+      /* Bantuan opsional: tangga kelipatan. Siswa tetap yang memutuskan. */
+      var helpBox = el('div', 'pool');
+      helpBox.style.display = 'none';
+      var bHelp = el('button', 'btn-ghost', 'Bingung? Lihat tangga kelipatan');
+      var helpRow = el('div', 'answer-row');
+      helpRow.appendChild(bHelp);
+
+      bHelp.addEventListener('click', function () {
+        helpBox.style.display = '';
+        bHelp.style.display = 'none';
+        helpBox.innerHTML = '';
+        helpBox.appendChild(el('div', 'pool-label',
+          'Tangga kelipatan ' + s.div + ' — cari yang hasilnya ' + s.total + ':'));
+        for (var k = 1; k <= Math.max(answer + 2, 5); k++) {
+          var chip = el('span', 'array-item');
+          chip.style.fontSize = '0.85rem';
+          chip.style.fontWeight = '800';
+          chip.style.padding = '5px 10px';
+          chip.style.borderRadius = '10px';
+          chip.style.background = 'rgba(249,168,37,0.2)';
+          chip.style.border = '2px solid rgba(249,168,37,0.45)';
+          chip.textContent = s.div + '×' + k + '=' + (s.div * k);
+          helpBox.appendChild(chip);
+        }
+      });
+
+      L.answerRow(task, {
+        onSubmit: function (v) {
+          if (v === answer) {
+            api.win('Benar! ' + s.div + ' × ' + answer + ' = ' + s.total +
+              ', jadi ' + s.total + ' : ' + s.div + ' = ' + answer + '.');
+            return true;
+          }
+          api.no(s.div + ' × ' + v + ' = ' + (s.div * v) + ', bukan ' + s.total +
+            '. Coba angka yang ' + (s.div * v < s.total ? 'lebih besar' : 'lebih kecil') + '.');
+          return false;
+        }
+      });
+
+      host.appendChild(task);
+      task.appendChild(helpRow);
+      task.appendChild(helpBox);
+    }
+
+    /* =========================================================
+       LEVEL 3 — POROGAPIT
+       Semua soal: 2 angka : 1 angka, tanpa sisa,
+       tiap digit habis dibagi supaya cocok untuk kelas III.
+       ========================================================= */
+    var POROGAPIT_SOAL = [
+      { n: 84, d: 4 }, { n: 96, d: 3 }, { n: 68, d: 2 },
+      { n: 93, d: 3 }, { n: 88, d: 4 }, { n: 69, d: 3 },
+      { n: 86, d: 2 }, { n: 55, d: 5 }, { n: 64, d: 2 }
+    ];
+
+    function buildPorogapit(host, api) {
+      var s = api.soal(POROGAPIT_SOAL);
+      var d1 = Math.floor(s.n / 10), d2 = s.n % 10;
+      var q1 = d1 / s.d, q2 = d2 / s.d;      // dijamin bulat oleh bank soal
+      var result = s.n / s.d;
+
+      var task = el('div', 'paper');
+      var t = el('div', 'task-text');
+      t.innerHTML = 'Kerjakan <strong>' + s.n + ' : ' + s.d + '</strong> dengan cara ' +
+        '<strong>porogapit</strong>. Isi kotaknya langkah demi langkah.';
+      task.appendChild(t);
+
+      /* --- Susunan porogapit --- */
+      var stage = el('div', 'sum-stage');
+      var pg = el('div', 'porogapit');
+      pg.appendChild(el('div', 'porogapit-divisor', String(s.d)));
+
+      var body = el('div', 'porogapit-body');
+      function cell(cls, txt) { return el('div', 'cell' + (cls ? ' ' + cls : ''), txt); }
+      function row(cls) { var r = el('div', 'pg-row' + (cls ? ' ' + cls : '')); body.appendChild(r); return r; }
+
+      // baris hasil bagi (di atas garis)
+      var rQ = row('porogapit-quotient');
+      var cQ1 = cell('blank'), cQ2 = cell('blank');
+      rQ.appendChild(cQ1); rQ.appendChild(cQ2);
+
+      // baris bilangan yang dibagi
+      var rN = row();
+      rN.appendChild(cell(null, String(d1)));
+      rN.appendChild(cell(null, String(d2)));
+
+      // baris kurang pertama
+      var rS1 = row();
+      var cS1 = cell('blank underline');
+      rS1.appendChild(cS1); rS1.appendChild(cell());
+
+      // baris sisa + angka yang diturunkan
+      var rR1 = row();
+      var cR1 = cell('blank');
+      var cDown = cell('dim');
+      rR1.appendChild(cR1); rR1.appendChild(cDown);
+
+      // baris kurang kedua
+      var rS2 = row();
+      var cS2 = cell('blank underline');
+      rS2.appendChild(cell()); rS2.appendChild(cS2);
+
+      // sisa akhir
+      var rR2 = row();
+      var cR2 = cell('blank');
+      rR2.appendChild(cell()); rR2.appendChild(cR2);
+
+      pg.appendChild(body);
+      stage.appendChild(pg);
+
+      function fill(c, v) { c.textContent = v; c.classList.add('filled'); c.classList.remove('target'); }
+      var blanks = [cQ1, cS1, cR1, cQ2, cS2, cR2];
+      function targetOnly(c) {
+        blanks.forEach(function (x) { x.classList.remove('target'); });
+        if (c) c.classList.add('target');
+      }
+
+      var steps = [
+        {
+          prompt: 'Bagi angka depan dulu: <b>' + d1 + ' : ' + s.d + ' = ?</b><br>' +
+                  'Tulis hasilnya di atas garis.',
+          expect: q1,
+          hint: 'Cari angka yang kalau dikali ' + s.d + ' hasilnya ' + d1 + '.',
+          fill: function (v) { fill(cQ1, v); },
+          mark: function () { targetOnly(cQ1); }
+        },
+        {
+          prompt: 'Sekarang kalikan: <b>' + q1 + ' × ' + s.d + ' = ?</b><br>' +
+                  'Tulis di bawah angka ' + d1 + '.',
+          expect: q1 * s.d,
+          hint: 'Kalikan hasil bagi tadi (' + q1 + ') dengan pembaginya (' + s.d + ').',
+          fill: function (v) { fill(cS1, v); },
+          mark: function () { targetOnly(cS1); }
+        },
+        {
+          prompt: 'Kurangkan: <b>' + d1 + ' − ' + (q1 * s.d) + ' = ?</b>',
+          expect: d1 - q1 * s.d,
+          hint: 'Kurangi ' + d1 + ' dengan ' + (q1 * s.d) + '.',
+          fill: function (v) {
+            fill(cR1, v);
+            cDown.textContent = String(d2);   // turunkan angka berikutnya
+            cDown.classList.add('filled');
+          },
+          mark: function () { targetOnly(cR1); }
+        },
+        {
+          prompt: 'Angka <b>' + d2 + '</b> diturunkan. Sekarang <b>' + d2 + ' : ' + s.d + ' = ?</b><br>' +
+                  'Tulis di atas garis, sebelah hasil tadi.',
+          expect: q2,
+          hint: 'Cari angka yang kalau dikali ' + s.d + ' hasilnya ' + d2 + '.',
+          fill: function (v) { fill(cQ2, v); },
+          mark: function () { targetOnly(cQ2); }
+        },
+        {
+          prompt: 'Kalikan lagi: <b>' + q2 + ' × ' + s.d + ' = ?</b>',
+          expect: q2 * s.d,
+          hint: 'Kalikan ' + q2 + ' dengan ' + s.d + '.',
+          fill: function (v) { fill(cS2, v); },
+          mark: function () { targetOnly(cS2); }
+        },
+        {
+          prompt: 'Kurangkan terakhir: <b>' + d2 + ' − ' + (q2 * s.d) + ' = ?</b><br>' +
+                  'Kalau hasilnya 0, berarti pembagiannya habis!',
+          expect: d2 - q2 * s.d,
+          hint: 'Kurangi ' + d2 + ' dengan ' + (q2 * s.d) + '.',
+          fill: function (v) { fill(cR2, v); },
+          mark: function () { targetOnly(cR2); }
+        }
+      ];
+
+      host.appendChild(task);
+      task.appendChild(stage);
+
+      var work = el('div', 'paper');
+      host.appendChild(work);
+      L.runSteps(work, steps, api,
+        'Selesai! ' + s.n + ' : ' + s.d + ' = ' + result +
+        ', sisa 0. Kamu sudah bisa porogapit!');
+    }
+
+    /* ---------- Daftarkan level ---------- */
+    document.addEventListener('DOMContentLoaded', function () {
+      document.body.classList.add('ready');
+      L.init({
+        subject: 'pembagian',
+        levels: [
+          { name: 'Bagi Rata', rounds: 3, build: buildBagiRata,
+            clearText: 'Kamu sudah tahu membagi itu artinya membagi sama rata.' },
+          { name: 'Tebak Pasangan', rounds: 3, build: buildPasangan,
+            clearText: 'Kamu sudah tahu pembagian itu mencari pengali yang hilang.' },
+          { name: 'Porogapit', rounds: 3, build: buildPorogapit,
+            clearText: 'Kamu sudah bisa mengerjakan pembagian dengan cara porogapit!' }
+        ]
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

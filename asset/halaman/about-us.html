@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Me — Ochi</title>
+  <meta name="description" content="Tentang Rossy Fadhilah (Ochi) — kreator media pembelajaran matematika interaktif.">
+  <link rel="icon" href="../gambar/profil-ochi-2.png" type="image/x-icon">
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/about-us.css">
+</head>
+<body>
+  <!-- Back Button -->
+  <a href="../../index.html" class="back-home-btn" aria-label="Kembali ke Home">
+    <svg viewBox="0 0 24 24"><path d="M3 9.5L12 2l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.5z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="var(--color-forest)" stroke-width="2"/></svg>
+  </a>
+
+  <main class="about-shell">
+    <!-- Profile Hero -->
+    <section class="profile-hero">
+      <div class="profile-image-wrapper">
+        <!-- Foto asli di dalam bingkai ranting.
+             Bingkai digambar SVG (bukan potongan gambar) supaya tajam di
+             segala ukuran dan mudah disesuaikan. -->
+        <svg class="profile-frame" viewBox="0 0 1000 1000" role="img"
+             aria-label="Foto Rossy Fadhilah (Ochi) dalam bingkai ranting">
+          <defs>
+            <clipPath id="ochiOpening">
+              <path d="M142 150 Q500 134 862 154 Q878 500 858 870
+                       Q500 888 144 866 Q128 500 142 150 Z"/>
+            </clipPath>
+            <linearGradient id="twigBody" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#c99a55"/>
+              <stop offset="0.45" stop-color="#a9762f"/>
+              <stop offset="1" stop-color="#7d5320"/>
+            </linearGradient>
+          </defs>
+
+          <!-- FOTO -->
+          <image href="../gambar/profil-ochi.jpg" x="128" y="136" width="748" height="748"
+                 preserveAspectRatio="xMidYMid slice" clip-path="url(#ochiOpening)"/>
+          <!-- bayangan tipis di tepi dalam supaya foto terasa masuk ke bingkai -->
+          <path d="M142 150 Q500 134 862 154 Q878 500 858 870
+                   Q500 888 144 866 Q128 500 142 150 Z"
+                fill="none" stroke="rgba(60,35,10,0.35)" stroke-width="10"
+                clip-path="url(#ochiOpening)"/>
+
+          <!-- RANTING: tiap batang digambar 3 lapis (tepi gelap, badan, sorotan) -->
+          <g class="twigs" fill="none" stroke-linecap="round">
+            <!-- atas -->
+            <path d="M58 118 Q300 104 520 116 Q752 129 946 111" stroke="#5d3a13" stroke-width="40"/>
+            <path d="M58 118 Q300 104 520 116 Q752 129 946 111" stroke="url(#twigBody)" stroke-width="31"/>
+            <path d="M78 111 Q300 98 520 110 Q740 122 928 105" stroke="rgba(255,232,190,0.45)" stroke-width="7"/>
+            <!-- bawah -->
+            <path d="M60 894 Q300 908 520 895 Q752 881 944 900" stroke="#5d3a13" stroke-width="40"/>
+            <path d="M60 894 Q300 908 520 895 Q752 881 944 900" stroke="url(#twigBody)" stroke-width="31"/>
+            <path d="M80 887 Q300 901 520 888 Q740 875 926 893" stroke="rgba(255,232,190,0.40)" stroke-width="7"/>
+            <!-- kiri -->
+            <path d="M120 60 Q104 300 116 520 Q129 754 110 946" stroke="#5d3a13" stroke-width="40"/>
+            <path d="M120 60 Q104 300 116 520 Q129 754 110 946" stroke="url(#twigBody)" stroke-width="31"/>
+            <path d="M113 80 Q98 300 110 520 Q122 742 104 928" stroke="rgba(255,232,190,0.40)" stroke-width="7"/>
+            <!-- kanan -->
+            <path d="M882 58 Q898 300 886 520 Q873 754 892 944" stroke="#5d3a13" stroke-width="40"/>
+            <path d="M882 58 Q898 300 886 520 Q873 754 892 944" stroke="url(#twigBody)" stroke-width="31"/>
+            <path d="M889 78 Q904 300 892 520 Q879 742 898 926" stroke="rgba(255,232,190,0.35)" stroke-width="7"/>
+          </g>
+
+          <!-- Tonjolan kecil / mata ranting -->
+          <g fill="#8d5524" opacity="0.85">
+            <ellipse cx="352" cy="110" rx="13" ry="7"/>
+            <ellipse cx="678" cy="121" rx="11" ry="6"/>
+            <ellipse cx="112" cy="392" rx="7" ry="12"/>
+            <ellipse cx="889" cy="648" rx="7" ry="12"/>
+            <ellipse cx="430" cy="901" rx="12" ry="6"/>
+          </g>
+          <!-- ranting kecil bercabang -->
+          <g fill="none" stroke="#8d5524" stroke-width="9" stroke-linecap="round">
+            <path d="M112 392 Q88 378 74 384"/>
+            <path d="M889 648 Q914 636 928 643"/>
+            <path d="M352 110 Q346 88 356 74"/>
+          </g>
+
+          <!-- IKATAN TALI di keempat persilangan -->
+          <!-- gulungan tali: beberapa lilitan sejajar di setiap persilangan -->
+          <g class="lashing" fill="none" stroke-linecap="round">
+            <g stroke="#8a6534" stroke-width="15">
+              <path d="M86 100 L150 140"/><path d="M86 122 L150 162"/><path d="M92 78 L156 118"/>
+              <path d="M850 140 L914 100"/><path d="M850 162 L914 122"/><path d="M844 118 L908 78"/>
+              <path d="M86 870 L150 910"/><path d="M86 892 L150 932"/><path d="M92 848 L156 888"/>
+              <path d="M850 910 L914 870"/><path d="M850 932 L914 892"/><path d="M844 888 L908 848"/>
+            </g>
+            <g stroke="#d8b184" stroke-width="9">
+              <path d="M86 100 L150 140"/><path d="M86 122 L150 162"/><path d="M92 78 L156 118"/>
+              <path d="M850 140 L914 100"/><path d="M850 162 L914 122"/><path d="M844 118 L908 78"/>
+              <path d="M86 870 L150 910"/><path d="M86 892 L150 932"/><path d="M92 848 L156 888"/>
+              <path d="M850 910 L914 870"/><path d="M850 932 L914 892"/><path d="M844 888 L908 848"/>
+            </g>
+            <g stroke="rgba(255,240,215,0.5)" stroke-width="2.5">
+              <path d="M88 96 L148 133"/><path d="M88 118 L148 155"/><path d="M94 74 L154 111"/>
+              <path d="M852 133 L912 96"/><path d="M852 155 L912 118"/><path d="M846 111 L906 74"/>
+              <path d="M88 866 L148 903"/><path d="M88 888 L148 925"/><path d="M94 844 L154 881"/>
+              <path d="M852 903 L912 866"/><path d="M852 925 L912 888"/><path d="M846 881 L906 844"/>
+            </g>
+          </g>
+
+          <!-- BURUNG kecil bertengger di batang atas -->
+          <g transform="translate(688 4) scale(1.3)">
+           <g class="frame-bird">
+            <!-- badan -->
+            <ellipse cx="24" cy="56" rx="34" ry="26" fill="#a9764c"/>
+            <ellipse cx="17" cy="63" rx="24" ry="17" fill="#d9b189"/>
+            <!-- ekor -->
+            <path d="M-6 44 Q-36 26 -44 10 Q-20 25 0 34 Z" fill="#8c5c36"/>
+            <!-- sayap -->
+            <path d="M14 48 Q40 60 20 76 Q2 66 14 48 Z" fill="#8c5c36"/>
+            <path d="M18 54 Q34 62 22 71" fill="none" stroke="#6f4526" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- kepala -->
+            <circle cx="56" cy="36" r="21" fill="#a9764c"/>
+            <path d="M48 20 Q56 8 64 20 Z" fill="#8c5c36"/>
+            <circle cx="63" cy="32" r="5" fill="#2b1a0e"/>
+            <circle cx="64.8" cy="30.2" r="1.7" fill="#fff"/>
+            <!-- paruh -->
+            <path d="M76 38 L96 44 L76 49 Z" fill="#e8a94f"/>
+            <path d="M76 44 L94 44" stroke="#c98b32" stroke-width="1.6"/>
+            <!-- kaki, menempel di batang -->
+            <g stroke="#e8a94f" stroke-width="5" stroke-linecap="round">
+              <path d="M16 80 L16 92"/>
+              <path d="M34 80 L34 92"/>
+            </g>
+           </g>
+          </g>
+        </svg>
+      </div>
+      <div class="bio-card">
+        <h2 class="bio-heading">Kenalan Yuk!</h2>
+        <p>
+          Hai! Aku <strong>Rossy Fadhilah</strong>, tapi teman-teman biasanya memanggilku <strong>Ochi</strong>. Aku adalah mahasiswa PGSD di IKIP Siliwangi yang punya ketertarikan besar pada dunia pendidikan, kreativitas, dan media pembelajaran.
+        </p>
+        <p>
+          Sejak tahun 2023, aku mulai mengajar anak-anak sekolah dasar. Dari pengalaman tersebut, aku semakin menyadari bahwa setiap anak punya cara belajar yang berbeda. Karena itu, aku tertarik untuk membuat media pembelajaran yang menarik, interaktif, dan mudah dipahami.
+        </p>
+        <p>
+          Nah, melalui website ini, aku menghadirkan media pembelajaran untuk membantu kalian belajar operasi hitung campuran dengan cara yang lebih menyenangkan. Ada materi, latihan interaktif, hingga permainan ular tangga yang bisa kalian gunakan sambil belajar.
+        </p>
+        <p class="bio-closing">
+          Yuk, belajar bareng dan buktikan kalau matematika juga bisa <strong>FUN!</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- MY LITTLE BELIEF Quote -->
+    <section class="belief-section">
+      <div class="belief-card">
+        <div class="belief-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+        </div>
+        <h3 class="belief-title">MY LITTLE BELIEF</h3>
+        <blockquote class="belief-quote">
+          "Belajar nggak harus selalu tentang seberapa cepat kita memahami sesuatu, tapi tentang bagaimana kita menikmati proses untuk terus mencoba."
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- Interests Section -->
+    <section class="interests-section">
+      <h2 class="interests-title">Minat &amp; Hobi</h2>
+
+      <div class="interests-desc">
+        Selain senang mengajar dan membuat media pembelajaran, aku juga punya beberapa hal yang aku sukai!
+      </div>
+
+      <div class="interest-grid">
+        <div class="interest-card">
+          <img src="../gambar/intro-1.png" alt="Menyanyi">
+          <span class="interest-label">&#127908; Music &amp; Voice</span>
+          <p class="interest-desc">Aku suka menyanyi karena lewat musik aku bisa mengekspresikan diri, menghilangkan penat, dan tentunya having fun!</p>
+        </div>
+        <div class="interest-card">
+          <img src="../gambar/intro-2.png" alt="Mengajar &amp; Belajar">
+          <span class="interest-label">&#128218; Teaching &amp; Learning</span>
+          <p class="interest-desc">Aku senang belajar hal-hal baru, terutama hal yang bisa menambah pengetahuan dan membantuku menjadi calon guru yang lebih kreatif.</p>
+        </div>
+        <div class="interest-card">
+          <img src="../gambar/intro-3.png" alt="Jajan &amp; Kuliner">
+          <span class="interest-label">&#127856; Food &amp; Fun</span>
+          <p class="interest-desc">Dan yang nggak kalah penting... aku suka jajan! Menurutku, menikmati makanan enak adalah salah satu bentuk apresiasi kecil untuk diri sendiri.</p>
+        </div>
+        <div class="interest-card">
+          <img src="../gambar/intro-4.png" alt="Kreatif &amp; Content">
+          <span class="interest-label">&#127912; Kreatif &amp; Content</span>
+          <p class="interest-desc">Aku suka bikin konten edukatif dan kreatif untuk menginspirasi banyak orang. Because sharing is caring!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SOSIAL MEDIA & KONTAK
+
+         Logonya memakai berkas resmi yang dikirim klien
+         (asset/sosmed/*.png) — bukan gambar buatan sendiri. Keempatnya
+         sudah berbentuk lingkaran dengan latar transparan, jadi wadahnya
+         dibiarkan bening dan hanya diberi bayangan tipis; itu perlu
+         supaya logo Gmail yang lingkarannya putih tetap terlihat batas
+         tepinya di atas kartu yang juga putih.
+
+         Tautan platform dibuka di tab baru (target="_blank") supaya
+         halaman ini tidak ikut berpindah — penting karena situsnya
+         dibuka langsung dari berkas, jadi tombol "kembali" tidak selalu
+         ada. rel="noopener noreferrer" dipakai sesuai praktik umum.
+         Kartu email TIDAK memakai target="_blank": mailto: cukup
+         diserahkan ke aplikasi surat, kalau dipaksa tab baru sebagian
+         peramban meninggalkan tab kosong.
+         ============================================================ -->
+    <section class="sosmed-section">
+      <h2 class="interests-title">Temukan Aku Di</h2>
+
+      <div class="sosmed-desc">
+        Mau tanya-tanya atau lihat kegiatan &amp; kontenku yang lain? Mampir ke sini ya!
+      </div>
+
+      <div class="sosmed-grid">
+        <a class="sosmed-card" style="--aksen:#d62976"
+           href="https://www.instagram.com/rossyfadhilah.ir"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Instagram rossyfadhilah.ir, terbuka di tab baru">
+          <span class="sosmed-ikon">
+            <img src="../gambar/sosmed/instagram.png" alt="" width="160" height="160">
+          </span>
+          <span class="sosmed-teks">
+            <span class="sosmed-nama">Instagram</span>
+            <span class="sosmed-akun">@rossyfadhilah.ir</span>
+          </span>
+          <svg class="sosmed-panah" viewBox="0 0 24 24" aria-hidden="true" fill="none"
+               stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7"/><path d="M9.5 7H17v7.5"/>
+          </svg>
+        </a>
+
+        <a class="sosmed-card" style="--aksen:#1f2733"
+           href="https://www.tiktok.com/@rossyfadhilah.ir"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="TikTok rossyfadhilah.ir, terbuka di tab baru">
+          <span class="sosmed-ikon">
+            <img src="../gambar/sosmed/tiktok.png" alt="" width="160" height="160">
+          </span>
+          <span class="sosmed-teks">
+            <span class="sosmed-nama">TikTok</span>
+            <span class="sosmed-akun">@rossyfadhilah.ir</span>
+          </span>
+          <svg class="sosmed-panah" viewBox="0 0 24 24" aria-hidden="true" fill="none"
+               stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7"/><path d="M9.5 7H17v7.5"/>
+          </svg>
+        </a>
+
+        <a class="sosmed-card" style="--aksen:#0a66c2"
+           href="https://id.linkedin.com/in/rossy-fadhilah-irjaki-640160326"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="LinkedIn Rossy Fadhilah, terbuka di tab baru">
+          <span class="sosmed-ikon">
+            <img src="../gambar/sosmed/linkedin.png" alt="" width="160" height="160">
+          </span>
+          <span class="sosmed-teks">
+            <span class="sosmed-nama">LinkedIn</span>
+            <span class="sosmed-akun">Rossy Fadhilah</span>
+          </span>
+          <svg class="sosmed-panah" viewBox="0 0 24 24" aria-hidden="true" fill="none"
+               stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7"/><path d="M9.5 7H17v7.5"/>
+          </svg>
+        </a>
+
+        <a class="sosmed-card" style="--aksen:#ea4335"
+           href="mailto:rossyfadhilahir@gmail.com"
+           aria-label="Kirim email ke rossyfadhilahir@gmail.com">
+          <span class="sosmed-ikon">
+            <img src="../gambar/sosmed/email.png" alt="" width="160" height="160">
+          </span>
+          <span class="sosmed-teks">
+            <span class="sosmed-nama">Email</span>
+            <span class="sosmed-akun">rossyfadhilahir@gmail.com</span>
+          </span>
+          <svg class="sosmed-panah" viewBox="0 0 24 24" aria-hidden="true" fill="none"
+               stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7.5 12 13l8-5.5"/><rect x="3" y="5" width="18" height="14" rx="2.5"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../js/suara.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('ready');
+
+    // Back button page transition
+    var backBtn = document.querySelector('.back-home-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', function(e) {
+        if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          document.body.style.opacity = '0';
+          setTimeout(function() { window.location.href = backBtn.getAttribute('href'); }, 400);
+        }
+      });
+    }
+  });
+  </script>
+</body>
+</html>

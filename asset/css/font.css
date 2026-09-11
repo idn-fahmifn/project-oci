@@ -1,0 +1,31 @@
+/* ============================================================
+   Font lokal — tidak butuh internet.
+
+   Dulu kedua font ini diambil dari fonts.googleapis.com. Untuk
+   mode offline berkasnya disimpan sendiri di asset/font/ dalam
+   bentuk woff2 variable (satu berkas untuk semua ketebalan),
+   sudah disaring hanya ke huruf Latin jadi ukurannya kecil:
+   Baloo 2 ~33 KB, Nunito ~40 KB.
+
+   Berkas ini harus dimuat PALING AWAL di setiap halaman,
+   sebelum css lain, persis seperti posisi <link> Google Fonts
+   yang digantikannya.
+   ============================================================ */
+
+@font-face {
+  font-family: 'Baloo 2';
+  src: url('../font/baloo2.woff2') format('woff2-variations'),
+       url('../font/baloo2.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('../font/nunito.woff2') format('woff2-variations'),
+       url('../font/nunito.woff2') format('woff2');
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}

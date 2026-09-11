@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Ular Tangga Matematika</title>
   <meta name="description" content="Game Ular Tangga Operasi Hitung Campuran — media pembelajaran interaktif untuk siswa SD kelas III.">
-  <link rel="icon" href="asset/logo.png" type="image/x-icon">
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="asset/gambar/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="asset/css/font.css">
+  <link rel="stylesheet" href="asset/css/base.css">
+  <link rel="stylesheet" href="asset/css/styles.css">
 </head>
 <body class="entering">
 
@@ -21,7 +21,7 @@
   <!-- Top Bar -->
   <header class="top-bar">
     <div class="top-left">
-      <img src="asset/logo.png" alt="Logo" class="logo-mark">
+      <img src="asset/gambar/logo.png" alt="Logo" class="logo-mark">
       <button class="audio-btn" id="muteToggleBtn" aria-label="Mute / Unmute Audio" title="Mute / Unmute">
         <svg id="audioIcon" viewBox="0 0 24 24">
           <polygon id="audioIconPoly" points="9 9 13 9 17 5 17 19 13 15 9 15 9 9"/>
@@ -42,7 +42,7 @@
       </div>
     </div>
     <div class="top-right">
-      <a href="about-us.html" class="info-btn" id="aboutMeBtn" aria-label="About Me" title="Tentang Pembuat">
+      <a href="asset/halaman/about-us.html" class="info-btn" id="aboutMeBtn" aria-label="About Me" title="Tentang Pembuat">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-forest);">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
           <circle cx="12" cy="7" r="4"/>
@@ -59,24 +59,24 @@
   </header>
 
   <!-- Background Audio -->
-  <audio id="bgAudio" src="audio.mp3" loop></audio>
+  <audio id="bgAudio" src="asset/suara/musik-latar.mp3" loop></audio>
 
   <!-- Hero Section -->
   <main class="hero">
     <picture>
       <!-- spasi pada nama berkas harus ditulis %20: di srcset, spasi
            dipakai sebagai pemisah URL dan penanda ukuran -->
-      <source type="image/webp" srcset="asset/template%20matematika.webp">
-      <img src="asset/template matematika.png" alt="Ular Tangga Matematika" class="hero-image" width="1358" height="813" draggable="false">
+      <source type="image/webp" srcset="asset/gambar/judul-utama.webp">
+      <img src="asset/gambar/judul-utama.png" alt="Ular Tangga Matematika" class="hero-image" width="1358" height="813" draggable="false">
     </picture>
 
     <nav class="menu-stack">
-      <a class="btn-start" id="startGameBtn" href="ulartangga.html">
+      <a class="btn-start" id="startGameBtn" href="asset/halaman/ulartangga.html">
         <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         START GAME
       </a>
       <div class="menu-row">
-        <a class="btn" id="materiBtn" href="materi-page.html">Materi</a>
+        <a class="btn" id="materiBtn" href="asset/halaman/materi-page.html">Materi</a>
         <button class="btn" id="caraMainBtn" type="button">Cara Bermain</button>
       </div>
       <button class="btn btn-tujuan" id="tujuanBtn" type="button">Tujuan Pembelajaran</button>
@@ -323,7 +323,7 @@
     <span>&copy; <span id="copyrightYear"></span> Rossy Fadhilah</span>
   </footer>
 
-  <script src="js/suara.js"></script>
+  <script src="asset/js/suara.js"></script>
   <script>
   (function() {
     'use strict';
@@ -394,20 +394,20 @@
       // Start Game
       document.getElementById('startGameBtn').addEventListener('click', function(e) {
         e.preventDefault();
-        navigateTo('ulartangga.html');
+        navigateTo('asset/halaman/ulartangga.html');
       });
 
       // Materi
       document.getElementById('materiBtn').addEventListener('click', function(e) {
         e.preventDefault();
-        navigateTo('materi-page.html');
+        navigateTo('asset/halaman/materi-page.html');
       });
 
       // About Me
       document.getElementById('aboutMeBtn').addEventListener('click', function(e) {
         if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
           e.preventDefault();
-          navigateTo('about-us.html');
+          navigateTo('asset/halaman/about-us.html');
         }
       });
 

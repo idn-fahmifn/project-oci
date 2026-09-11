@@ -1,0 +1,13 @@
+# sampah macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# sampah Windows
+Thumbs.db
+desktop.ini
+
+# keluaran sementara / hasil uji
+Claude outputs/
+*.log

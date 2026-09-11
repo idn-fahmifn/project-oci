@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latihan Perkalian</title>
+  <meta name="description" content="Latihan perkalian interaktif — siswa menyusun, melompat, dan menghitung sendiri.">
+  <link rel="icon" href="../gambar/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/materi-latihan.css">
+</head>
+<body>
+  <main class="latihan-shell">
+    <div class="latihan-topbar">
+      <a href="materi-page.html" class="back-link">&larr; Kembali ke Materi</a>
+      <div class="latihan-title">Perkalian &#10006;</div>
+    </div>
+
+    <div class="level-bar" id="levelBar"></div>
+    <div class="activity-board" id="activityBoard"></div>
+  </main>
+
+  <script src="../js/suara.js"></script>
+  <script src="../js/latihan-core.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    var L = Latihan, el = L.el;
+
+    /* =========================================================
+       LEVEL 1 — KOTAK AJAIB
+       Siswa menyusun sendiri baris & isi, lalu menghitung total.
+       ========================================================= */
+    var KOTAK_SOAL = [
+      { rows: 3, cols: 4, item: '🍎', wadah: 'keranjang', isi: 'apel' },
+      { rows: 4, cols: 5, item: '🍬', wadah: 'kantong',   isi: 'permen' },
+      { rows: 2, cols: 6, item: '🥚', wadah: 'rak',       isi: 'telur' },
+      { rows: 5, cols: 3, item: '🌸', wadah: 'pot',       isi: 'bunga' },
+      { rows: 3, cols: 6, item: '🍪', wadah: 'piring',    isi: 'kue' }
+    ];
+
+    function buildKotak(host, api) {
+      var s = api.soal(KOTAK_SOAL);
+      var rows = 0, cols = 0, solvedShape = false;
+
+      var task = el('div', 'paper');
+      var t = el('div', 'task-text');
+      t.innerHTML = 'Bu Guru punya <strong>' + s.rows + ' ' + s.wadah + '</strong>. ' +
+        'Setiap ' + s.wadah + ' diisi <strong>' + s.cols + ' ' + s.isi + '</strong>.<br>' +
+        'Susun dulu ' + s.isi + '-nya, lalu hitung sendiri semuanya!';
+      task.appendChild(t);
+
+      var ctrlRow = el('div', 'ctrl-row');
+      var stage = el('div', 'array-stage');
+
+      function stepper(label, get, set, max) {
+        var box = el('div', 'ctrl');
+        box.appendChild(el('span', 'ctrl-label', label));
+        var st = el('div', 'ctrl-stepper');
+        var minus = el('button', 'step-btn', '−');
+        var val = el('span', 'step-value', '0');
+        var plus = el('button', 'step-btn', '+');
+        minus.addEventListener('click', function () { if (get() > 0) { set(get() - 1); sync(); } });
+        plus.addEventListener('click', function () { if (get() < max) { set(get() + 1); sync(); } });
+        st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
+        box.appendChild(st);
+        box._val = val;
+        return box;
+      }
+
+      var rowBox = stepper('Jumlah ' + s.wadah, function () { return rows; },
+        function (v) { rows = v; }, 8);
+      var colBox = stepper(s.isi.charAt(0).toUpperCase() + s.isi.slice(1) + ' per ' + s.wadah,
+        function () { return cols; }, function (v) { cols = v; }, 8);
+      ctrlRow.appendChild(rowBox);
+      ctrlRow.appendChild(colBox);
+
+      function drawStage() {
+        stage.innerHTML = '';
+        if (rows === 0 || cols === 0) {
+          stage.appendChild(el('div', 'array-empty',
+            'Pakai tombol + di atas untuk menyusun ' + s.isi + '-nya…'));
+          return;
+        }
+        for (var r = 0; r < rows; r++) {
+          var line = el('div', 'array-row');
+          for (var c = 0; c < cols; c++) line.appendChild(el('span', 'array-item', s.item));
+          stage.appendChild(line);
+        }
+      }
+
+      var answerHost = el('div', 'paper');
+      answerHost.style.display = 'none';
+
+      function sync() {
+        rowBox._val.textContent = rows;
+        colBox._val.textContent = cols;
+        drawStage();
+
+        if (!solvedShape && rows === s.rows && cols === s.cols) {
+          solvedShape = true;
+          api.ok('Susunannya sudah benar! Sekarang hitung total ' + s.isi + '-nya.');
+          showAnswer();
+        }
+      }
+
+      function showAnswer() {
+        answerHost.style.display = '';
+        answerHost.innerHTML = '';
+        var q = el('div', 'task-text');
+        q.innerHTML = 'Ada <strong>' + s.rows + '</strong> baris, masing-masing <strong>' +
+          s.cols + '</strong> ' + s.isi + '.<br>Berapa jumlah semua ' + s.isi + '-nya?';
+        answerHost.appendChild(q);
+
+        L.answerRow(answerHost, {
+          onSubmit: function (v) {
+            if (v === s.rows * s.cols) {
+              api.win('Tepat! ' + s.rows + ' × ' + s.cols + ' = ' + (s.rows * s.cols) +
+                '. Jadi perkalian itu menjumlah kelompok yang sama banyak.');
+              return true;
+            }
+            if (v === s.rows + s.cols) {
+              api.no('Itu hasil ditambah. Di sini setiap baris isinya ' + s.cols +
+                ', dan barisnya ada ' + s.rows + '. Coba hitung satu-satu dulu.');
+            } else {
+              api.no('Belum tepat. Coba hitung barisnya satu per satu: ' +
+                new Array(s.rows + 1).join(s.cols + ' + ').slice(0, -3) + ' = ?');
+            }
+            return false;
+          }
+        });
+      }
+
+      host.appendChild(task);
+      task.appendChild(ctrlRow);
+      task.appendChild(stage);
+      host.appendChild(answerHost);
+      sync();
+    }
+
+    /* =========================================================
+       LEVEL 2 — LOMPAT ANGKA
+       Siswa melompat sendiri di garis bilangan, lalu simpulkan.
+       ========================================================= */
+    var LOMPAT_SOAL = [
+      { step: 4, times: 3 },
+      { step: 5, times: 4 },
+      { step: 3, times: 6 },
+      { step: 6, times: 3 },
+      { step: 7, times: 3 }
+    ];
+
+    function buildLompat(host, api) {
+      var s = api.soal(LOMPAT_SOAL);
+      var maxN = s.step * s.times;
+      var lineMax = Math.max(maxN, 20);
+      var at = 0, jumps = 0;
+
+      var task = el('div', 'paper');
+      var t = el('div', 'task-text');
+      t.innerHTML = 'Si Kodok mulai dari <strong>0</strong>. Dia melompat <strong>' +
+        s.step + ' langkah</strong> setiap kali, sebanyak <strong>' + s.times + ' kali</strong>.<br>' +
+        'Lompatkan kodoknya, lalu hitung sendiri dia berhenti di angka berapa!';
+      task.appendChild(t);
+
+      var wrap = el('div', 'numline-wrap');
+      var line = el('div', 'numline');
+      var hopper = el('div', 'numline-hopper', '🐸');
+      var ticks = [];
+      for (var i = 0; i <= lineMax; i++) {
+        var tk = el('div', 'numline-tick', String(i));
+        ticks.push(tk);
+        line.appendChild(tk);
+      }
+      line.appendChild(hopper);
+      wrap.appendChild(line);
+
+      var log = el('div', 'jump-log', 'Belum melompat');
+
+      function placeHopper() {
+        hopper.style.left = (at * 34 + 17) + 'px';
+      }
+      placeHopper();
+
+      var btnRow = el('div', 'answer-row');
+      var bJump = el('button', 'btn-check', 'Lompat! 🐸');
+      var bReset = el('button', 'btn-ghost', 'Ulangi');
+      btnRow.appendChild(bJump);
+      btnRow.appendChild(bReset);
+
+      var answerHost = el('div', 'paper');
+      answerHost.style.display = 'none';
+
+      bJump.addEventListener('click', function () {
+        if (jumps >= s.times) return;
+        at += s.step;
+        jumps++;
+        ticks[at].classList.add('marked');
+        placeHopper();
+        wrap.scrollLeft = Math.max(0, at * 34 - wrap.clientWidth / 2);
+
+        /* Hasil penjumlahannya SENGAJA tidak ditampilkan (permintaan
+           klien): yang ditulis hanya deret penjumlahannya, hasilnya
+           dihitung sendiri oleh siswa di kotak jawaban. */
+        var parts = [];
+        for (var k = 1; k <= jumps; k++) parts.push(s.step);
+        log.textContent = parts.join(' + ') + ' = ?';
+
+        if (jumps >= s.times) {
+          bJump.disabled = true;
+          api.ok('Kodoknya sudah melompat ' + s.times + ' kali!');
+          showAnswer();
+        }
+      });
+
+      bReset.addEventListener('click', function () {
+        at = 0; jumps = 0;
+        ticks.forEach(function (n) { n.classList.remove('marked'); });
+        placeHopper();
+        log.textContent = 'Belum melompat';
+        bJump.disabled = false;
+        answerHost.style.display = 'none';
+        api.clearMsg();
+      });
+
+      function showAnswer() {
+        answerHost.style.display = '';
+        answerHost.innerHTML = '';
+        var q = el('div', 'task-text');
+        q.innerHTML = 'Melompat <strong>' + s.step + '</strong> sebanyak <strong>' +
+          s.times + ' kali</strong> sama artinya dengan <strong>' + s.times + ' × ' +
+          s.step + '</strong>.<br>Jadi berapa hasilnya?';
+        answerHost.appendChild(q);
+
+        L.answerRow(answerHost, {
+          onSubmit: function (v) {
+            if (v === maxN) {
+              api.win('Benar! ' + s.times + ' × ' + s.step + ' = ' + maxN +
+                '. Melompat berulang itu sama dengan perkalian.');
+              return true;
+            }
+            api.no('Belum tepat. Lihat lagi garis bilangannya — kodoknya berhenti di angka berapa?');
+            return false;
+          }
+        });
+      }
+
+      host.appendChild(task);
+      task.appendChild(wrap);
+      task.appendChild(log);
+      task.appendChild(btnRow);
+      host.appendChild(answerHost);
+    }
+
+    /* =========================================================
+       LEVEL 3 — PERKALIAN BERSUSUN (teknik menyimpan)
+       Semua soal punya simpanan, hasil 2 angka.
+       ========================================================= */
+    var BERSUSUN_SOAL = [
+      { a: 27, b: 3 }, { a: 24, b: 4 }, { a: 18, b: 5 },
+      { a: 16, b: 6 }, { a: 29, b: 3 }, { a: 13, b: 7 },
+      { a: 23, b: 4 }, { a: 17, b: 5 }, { a: 14, b: 6 }
+    ];
+
+    function buildBersusun(host, api) {
+      var s = api.soal(BERSUSUN_SOAL);
+      var tens = Math.floor(s.a / 10), ones = s.a % 10;
+      var onesProd = ones * s.b;              // mis. 7×3 = 21
+      var onesDigit = onesProd % 10;          // 1  -> ditulis
+      var carry = Math.floor(onesProd / 10);  // 2  -> disimpan
+      var tensProd = tens * s.b;              // 2×3 = 6
+      var tensDigit = tensProd + carry;       // 6+2 = 8
+      var result = s.a * s.b;
+
+      var task = el('div', 'paper');
+      var t = el('div', 'task-text');
+      t.innerHTML = 'Kerjakan <strong>' + s.a + ' × ' + s.b + '</strong> dengan cara bersusun. ' +
+        'Isi kotaknya satu per satu — jangan lupa angka simpanannya!';
+      task.appendChild(t);
+
+      /* --- Susunan kolom --- */
+      var stage = el('div', 'sum-stage');
+      var grid = el('div', 'sum-grid');
+      grid.style.gridTemplateColumns = 'repeat(3, auto)';
+
+      function cell(cls, txt) { return el('div', 'cell' + (cls ? ' ' + cls : ''), txt); }
+
+      // baris 1: kotak simpanan di atas kolom puluhan
+      grid.appendChild(cell('carry'));                       // kolom operator
+      var carryCell = cell('carry blank');                   // atas puluhan
+      grid.appendChild(carryCell);
+      grid.appendChild(cell('carry'));                       // atas satuan
+
+      // baris 2: bilangan pertama
+      grid.appendChild(cell());
+      grid.appendChild(cell(null, String(tens)));
+      grid.appendChild(cell(null, String(ones)));
+
+      // baris 3: pengali
+      grid.appendChild(cell('op', '×'));
+      grid.appendChild(cell());
+      grid.appendChild(cell(null, String(s.b)));
+
+      // garis
+      grid.appendChild(el('div', 'rule-row'));
+
+      // baris 4: hasil
+      grid.appendChild(cell());
+      var resTens = cell('blank');
+      var resOnes = cell('blank');
+      grid.appendChild(resTens);
+      grid.appendChild(resOnes);
+
+      stage.appendChild(grid);
+
+      function fill(c, v) { c.textContent = v; c.classList.add('filled'); c.classList.remove('target'); }
+      function targetOnly(c) {
+        [carryCell, resTens, resOnes].forEach(function (x) { x.classList.remove('target'); });
+        if (c) c.classList.add('target');
+      }
+
+      var steps = [
+        {
+          prompt: 'Kalikan satuannya dulu: <b>' + ones + ' × ' + s.b + ' = ?</b>',
+          expect: onesProd,
+          hint: 'Coba hitung ' + ones + ' × ' + s.b + ' pelan-pelan. Hasilnya lebih dari 10.',
+          mark: function () { targetOnly(null); }
+        },
+        {
+          prompt: 'Hasilnya <b>' + onesProd + '</b>. Angka satuannya ditulis di kotak satuan. Angka berapa itu?',
+          expect: onesDigit,
+          hint: onesProd + ' terdiri dari ' + carry + ' puluhan dan ' + onesDigit +
+                ' satuan. Yang ditulis di kotak satuan adalah satuannya.',
+          fill: function (v) { fill(resOnes, v); },
+          mark: function () { targetOnly(resOnes); }
+        },
+        {
+          prompt: 'Sisanya <b>disimpan</b> di atas kolom puluhan. Berapa angka simpanannya?',
+          expect: carry,
+          hint: 'Dari ' + onesProd + ', satuannya (' + onesDigit + ') sudah ditulis. ' +
+                'Puluhannya yang disimpan, yaitu ' + carry + '.',
+          fill: function (v) { fill(carryCell, v); },
+          mark: function () { targetOnly(carryCell); }
+        },
+        {
+          prompt: 'Sekarang puluhannya: <b>' + tens + ' × ' + s.b + ' = ?</b>',
+          expect: tensProd,
+          hint: 'Kalikan angka puluhan (' + tens + ') dengan ' + s.b + '.',
+          mark: function () { targetOnly(null); }
+        },
+        {
+          prompt: 'Tambahkan angka simpanan: <b>' + tensProd + ' + ' + carry + ' = ?</b>',
+          expect: tensDigit,
+          hint: 'Jumlahkan ' + tensProd + ' dengan simpanan ' + carry + '.',
+          fill: function (v) { fill(resTens, v); },
+          mark: function () { targetOnly(resTens); }
+        }
+      ];
+
+      host.appendChild(task);
+      task.appendChild(stage);
+
+      var work = el('div', 'paper');
+      host.appendChild(work);
+      L.runSteps(work, steps, api,
+        'Selesai! ' + s.a + ' × ' + s.b + ' = ' + result +
+        '. Kamu sudah bisa perkalian bersusun dengan teknik menyimpan!');
+    }
+
+    /* ---------- Daftarkan level ---------- */
+    document.addEventListener('DOMContentLoaded', function () {
+      document.body.classList.add('ready');
+      L.init({
+        subject: 'perkalian',
+        levels: [
+          { name: 'Kotak Ajaib', rounds: 3, build: buildKotak,
+            clearText: 'Kamu sudah tahu perkalian itu menjumlahkan kelompok yang sama banyak.' },
+          { name: 'Lompat Angka', rounds: 3, build: buildLompat,
+            clearText: 'Kamu sudah bisa melihat perkalian sebagai lompatan berulang di garis bilangan.' },
+          { name: 'Bersusun', rounds: 3, build: buildBersusun,
+            clearText: 'Kamu sudah bisa mengerjakan perkalian bersusun dengan teknik menyimpan!' }
+        ]
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

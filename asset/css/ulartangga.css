@@ -1,0 +1,2125 @@
+/* ============================================
+   ULARTANGGA.CSS — Snake & Ladder Game Page
+   ============================================ */
+
+/* Font dimuat lewat <link> di ulartangga.html (Baloo 2 + Nunito).
+   Import Fredoka One/Poppins dihapus: sudah tidak dipakai dan
+   @import menahan proses render. */
+
+:root {
+  /* ---- Tema Papan Kayu (semua pop up) ---- */
+  --wood-dark: #74441b;
+  --wood-mid: #8d5524;
+  --wood-base: #b26933;
+  --wood-cream: #fff8e1;
+  --wood-ink: #4a3520;
+  --paper-1: #fffaf0;
+  --paper-2: #fff4de;
+  --wood-frame-shadow:
+    0 10px 0 rgba(74, 40, 14, 0.45),
+    0 18px 44px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 3px rgba(255, 244, 214, 0.35);
+  --paper-shadow:
+    0 5px 0 rgba(90, 54, 26, 0.35),
+    0 10px 22px rgba(0, 0, 0, 0.22),
+    inset 0 2px 0 rgba(255, 255, 255, 0.85);
+  --wood-text-shadow:
+    2px 2px 0 #5a3610, -2px 2px 0 #5a3610,
+    2px -2px 0 #5a3610, -2px -2px 0 #5a3610,
+    0 5px 10px rgba(0, 0, 0, 0.35);
+
+  --audio-btn-bg: rgba(255, 255, 255, 0.88);
+  --audio-btn-shadow: 0 3px 8px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255,251,228,0.6);
+  --audio-btn-radius: 50%;
+  --audio-btn-size: clamp(32px, 6vw, 44px);
+  --volume-slider-track: #c8e6c9;
+  --volume-slider-thumb: #1a6b3c;
+  --game-radius: 22px;
+  /* rasio ilustrasi papan (2496x1696) — dipakai papan & panel melayang */
+  --board-ratio: 1.4717;
+}
+
+/* ---------- Base ---------- */
+body {
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  background: url("../gambar/latar-beranda.png") no-repeat center center fixed;
+  background-size: cover;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* flex-start + margin auto: tetap ketengah kalau ruang cukup,
+     tapi tidak memotong bagian atas kalau konten lebih tinggi dari layar */
+  justify-content: flex-start;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 8px 0 14px;
+  box-sizing: border-box;
+  color: #2e2e2e;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+body.fadein { opacity: 1; }
+
+/* ---------- Top Bar ---------- */
+.top-btn-bar {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 401;
+  pointer-events: none;
+}
+
+.back-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  border: 1.5px solid rgba(255,255,255,0.5);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 402;
+  pointer-events: auto;
+  position: static;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+  text-decoration: none;
+  outline: none;
+}
+
+.back-btn:hover, .back-btn:focus {
+  background: white;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  transform: scale(1.08);
+}
+
+.back-btn:active {
+  transform: scale(0.96);
+}
+
+.back-btn .icon-home {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: #1a6b3c;
+  pointer-events: none;
+  transition: fill 0.18s;
+}
+
+.back-btn:hover .icon-home { fill: #2d8a54; }
+
+/* ---------- Audio ---------- */
+.mute-toggle-btn {
+  width: var(--audio-btn-size);
+  height: var(--audio-btn-size);
+  background: var(--audio-btn-bg);
+  box-shadow: var(--audio-btn-shadow);
+  border-radius: var(--audio-btn-radius);
+  border: 1.5px solid rgba(255,255,255,0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+  z-index: 402;
+  pointer-events: auto;
+  position: static;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.mute-toggle-btn:hover {
+  background: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transform: scale(1.05);
+}
+
+.mute-toggle-btn:active { background: rgba(255,255,255,0.7); }
+
+.audio-dropdown-container {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  z-index: 34000;
+  user-select: none;
+  pointer-events: none;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.audio-dropdown {
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.6);
+  margin-left: 0;
+  padding: 14px 18px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  transform: translateY(-10px) scale(0.96);
+  transition: opacity 0.25s, transform 0.3s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.audio-dropdown.show {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.audio-volume-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.audio-volume-min, .audio-volume-max {
+  font-size: 0.85em;
+  color: #6b6b6b;
+  font-weight: 600;
+}
+
+.audio-volume-mute-mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  transition: opacity 0.18s;
+}
+
+.audio-volume-mute-mini svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  stroke: #1a6b3c;
+  transition: stroke 0.16s;
+}
+
+.audio-volume-mute-mini.muted svg { stroke: #999; }
+
+.audio-volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #c8e6c9, #1a6b3c);
+  outline: none;
+  margin: 0 4px;
+}
+
+.audio-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #1a6b3c;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.audio-volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #1a6b3c;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.audio-volume-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #c8e6c9, #1a6b3c);
+}
+
+/* ---------- Status Panel ---------- */
+.status-panel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  align-items: flex-start;   /* jangan stretch: kotak timer tadinya melar jadi kartu kosong */
+  margin: auto auto 10px;    /* margin-top auto = pemusat vertikal yang aman */
+  max-width: 920px;
+  width: min(100%, 920px);
+  padding: 0 8px;
+  box-sizing: border-box;    /* tanpa ini padding-nya menambah lebar -> ponsel jadi bisa digeser ke samping */
+}
+
+.timer-box, .scoreboard {
+  background: rgba(255,255,255,0.94);
+  border: 1.5px solid rgba(76,175,80,0.15);
+  border-radius: var(--game-radius);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+  padding: 11px 16px;
+  min-width: 190px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#scoreboardList {
+  display: grid;
+  gap: 6px;
+}
+
+#scoreboardList.two-col {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 560px) {
+  #scoreboardList { gap: 4px; }
+  /* tetap 2 kolom: 4 pemain jadi 2 baris, bukan 4 */
+  #scoreboardList.two-col { grid-template-columns: 1fr 1fr; gap: 4px; }
+  #scoreboardList.two-col .player-score { padding: 5px 7px; font-size: 11px; }
+  #scoreboardList.two-col .player-status { display: none; }
+  .scoreboard { padding: 8px 10px; min-width: 0; }
+  .status-panel { gap: 8px; }
+}
+
+/* Layar lebar tapi pendek (laptop pada umumnya): papan ular tangga terkunci
+   oleh tinggi, jadi panel posisi dijadikan satu baris supaya tinggi yang
+   dihemat langsung dipakai papan — papannya jadi jauh lebih besar. */
+@media (min-width: 900px) and (max-height: 920px) {
+  #scoreboardList.two-col { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  #scoreboardList.two-col .player-score { padding: 5px 8px; font-size: 12px; }
+  .scoreboard { padding: 8px 12px; }
+  .timer-box { padding: 8px 14px; font-size: 15px; }
+  .status-panel { gap: 8px; margin-bottom: 6px; }
+}
+
+.timer-box {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: #1a6b3c;
+  min-width: 0;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.scoreboard h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #5d4037;
+}
+
+.player-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255,249,196,0.3);
+  border: 1px solid rgba(76,175,80,0.08);
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.player-score.active-player {
+  background: linear-gradient(135deg, rgba(255,249,196,0.6) 0%, rgba(255,224,168,0.5) 100%);
+  border-color: #f9a825;
+  box-shadow: 0 8px 20px rgba(249,168,37,0.12);
+  transform: translateY(-1px);
+}
+
+.player-score:last-child { margin-bottom: 0; }
+
+.player-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.player-badge img { width: 28px; height: 28px; }
+
+.player-score.active-player .player-badge img { width: 34px; height: 34px; }
+
+.player-score .player-status {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #f9a825;
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.dice-display {
+  margin-top: 14px;
+  font-size: 14px;
+  color: #5d4037;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ---------- Game Wrapper ---------- */
+.game-wrapper {
+  position: relative;
+  background: rgba(255,255,255,0.92);
+  padding: 11px;
+  border-radius: var(--game-radius);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  border: 1.5px solid rgba(255,255,255,0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  margin-bottom: auto;       /* pasangan margin-top auto di status panel */
+  /* Lebar dibuat pasti (bukan menyesuaikan isi) supaya width:100% papan
+     punya acuan yang jelas — kalau tidak, lebar papan malah mengikuti
+     lebar baris kontrol dan jadi menyusut sendiri di layar besar. */
+  width: min(100%, 1024px);
+  box-sizing: border-box;
+}
+
+/* ---------- Board ----------
+   Papan = satu ilustrasi (asset/board-ular-tangga.*) dengan rasio
+   2496x1696 = 1.4717. Lebarnya dibatasi tiga hal sekaligus: lebar
+   layar, batas maksimum, dan tinggi yang tersisa setelah status panel
+   + kontrol (--board-reserve) dikalikan rasio. Jadi papan selalu utuh
+   tanpa perlu di-zoom-out, baik di laptop pendek maupun di ponsel. */
+.board-container {
+  position: relative;
+  /* 100% = lebar isi .game-wrapper, jadi padding pembungkus sudah ikut
+     terhitung dan papan tidak pernah menonjol keluar layar. */
+  width: min(100%, 980px,
+             calc((100vh - var(--board-reserve, 300px)) * var(--board-ratio)));
+  aspect-ratio: 2496 / 1696;
+  height: auto;
+  box-sizing: border-box;
+  border: 5px solid #1a6b3c;
+  background: #3d2a17;
+  border-radius: 20px;
+  /* ketengah: kalau papan dibatasi tinggi layar, lebarnya lebih kecil
+     dari kartu pembungkus — tanpa ini papan menempel ke kiri */
+  margin: 0 auto 10px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 12px 36px rgba(0,0,0,0.12);
+}
+
+.board-pic { display: block; }
+
+.board-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;      /* rasio kotak sudah sama, jadi tidak terpotong */
+  user-select: none;
+  z-index: 1;
+}
+
+.board {
+  position: absolute;   /* kotak petak diletakkan absolut di atas gambar */
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+/* Kotak petak sengaja transparan: angka & petaknya sudah tergambar di
+   ilustrasi. Kotak ini hanya penanda tempat pion berdiri. */
+.cell {
+  position: absolute;
+  transform: translate(-50%, -50%);   /* left/top = titik tengah petak */
+  box-sizing: border-box;
+  border-radius: 8px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Rule-rule warna & border sisa layout grid lama sudah dihapus —
+   petak sekarang diwarnai per baris di bagian "Warna petak di jalur meliuk"
+   di bawah, dan posisinya absolut mengikuti jalur. */
+/* START & FINISH digaya di bagian "Warna petak di jalur meliuk" di bawah */
+
+/* Blok .overlay lama (ular & tangga digambar pakai SVG) sudah dihapus:
+   papan sekarang berupa ilustrasi yang sudah memuat ular & tangganya. */
+
+/* ---------- Tokens ---------- */
+.token {
+  width: 34px;
+  height: 34px;
+  position: absolute;
+  box-sizing: border-box;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+  transition: top 0.4s ease-out, left 0.4s ease-out;
+  top: 290px;
+  left: 10px;
+  pointer-events: none;
+  background: none;
+  transform-origin: 50% 100%;   /* melompat bertumpu di kaki */
+}
+
+/* Efek melangkah: tiap petak yang dilewati, pion melompat kecil lalu
+   mendarat dengan sedikit gepeng — dipasang per langkah dari JS. */
+@keyframes tokenStep {
+  0%   { transform: translateY(0)     scaleX(1)    scaleY(1); }
+  18%  { transform: translateY(-34%)  scaleX(0.93) scaleY(1.09); }
+  50%  { transform: translateY(-44%)  scaleX(1)    scaleY(1); }
+  82%  { transform: translateY(0)     scaleX(1.12) scaleY(0.88); }
+  100% { transform: translateY(0)     scaleX(1)    scaleY(1); }
+}
+
+.token.stepping {
+  animation: tokenStep 190ms cubic-bezier(0.33, 0, 0.4, 1);
+  z-index: 13;               /* pion yang sedang jalan selalu di atas */
+}
+
+/* Meluncur di ular / memanjat tangga: geraknya lebih panjang dan
+   sedikit berputar, biar beda rasanya dari melangkah biasa. */
+@keyframes tokenSlide {
+  0%   { transform: translateY(0) rotate(0deg)   scale(1); }
+  35%  { transform: translateY(-16%) rotate(-9deg) scale(1.1); }
+  100% { transform: translateY(0) rotate(0deg)   scale(1); }
+}
+
+.token.sliding {
+  animation: tokenSlide 480ms ease-in-out;
+  z-index: 13;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .token.stepping, .token.sliding { animation: none; }
+}
+
+/* ---------- Controls ---------- */
+.controls {
+  display: grid;
+  grid-template-columns: auto minmax(240px, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255,255,255,0.95);
+  padding: 11px 18px;
+  border-radius: 22px;
+  border: 1.5px solid rgba(76,175,80,0.12);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ============================================
+   MODE LAYAR PENUH — laptop/tablet mendatar
+   Papan mengisi layar (rasio tetap dijaga), sedangkan Papan Posisi,
+   waktu, dadu dan tombol jadi panel melayang di sudut layar. Di layar
+   yang lebih lebar dari rasio papan, panelnya jatuh di pinggir hitam
+   jadi tidak menutupi gambar sama sekali.
+   Ponsel & tampilan tegak tetap memakai susunan bertumpuk di atas.
+   ============================================ */
+@media (min-width: 900px) and (min-height: 520px) and (orientation: landscape) {
+  body {
+    padding: 0;
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+    justify-content: center;
+  }
+
+  .game-wrapper {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    background: #241708;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    overflow: hidden;
+  }
+
+  /* Sisa ruang di kiri-kanan papan diisi salinan papan itu sendiri yang
+     diburamkan dan digelapkan (../gambar/board-blur.jpg, 120px & <1 KB).
+     Dulu di situ terlihat latar halaman depan — hutan terang dengan
+     bunglon — yang beradu dengan papan hutan gelap. Karena sekarang
+     gambarnya sama, warnanya otomatis menyambung di ukuran layar apa pun. */
+  .game-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: -8%;                       /* lebih lebar dari layar: tepi buram tidak ikut terlihat */
+    background: url('../gambar/board-blur.jpg') no-repeat center center / cover;
+    filter: blur(26px) brightness(0.5) saturate(0.8);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .board-container {
+    position: relative;
+    z-index: 1;                       /* papan di atas latar buram */
+    width: min(100vw, calc(100vh * var(--board-ratio)));
+    max-width: none;
+    margin: 0;
+    border-width: 0;
+    border-radius: 0;
+    /* garis tipis + bayangan: batas papan tetap jelas walau latarnya senada */
+    box-shadow: 0 0 0 1px rgba(255, 240, 205, 0.16),
+                0 18px 70px rgba(0, 0, 0, 0.6);
+  }
+
+  /* ---- Zona bebas di kiri & kanan papan ----
+     Petak paling kiri berada di 29,6% lebar papan dan paling kanan di
+     89,6% (diukur dari CELL_POINTS). Jadi pinggir kiri <28% dan kanan
+     >91% cuma berisi pemandangan hutan — di situlah panel ditaruh
+     supaya tidak ada satu petak pun yang tertutup. */
+  .status-panel,
+  .controls {
+    --board-w: min(100vw, calc(100vh * var(--board-ratio)));
+    --gutter: calc((100vw - var(--board-w)) / 2);
+    --free-left: calc(var(--gutter) + var(--board-w) * 0.28);
+    --free-right: calc(var(--gutter) + var(--board-w) * 0.09);
+
+    position: fixed;
+    inset: 0;
+    display: block;          /* anak-anaknya diletakkan absolut per sudut */
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    z-index: 30;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    pointer-events: none;    /* klik tembus ke papan */
+  }
+  .status-panel > *,
+  .controls > * { pointer-events: auto; position: absolute; }
+
+  /* kiri atas: waktu lalu Papan Posisi (turun sedikit supaya lolos
+     tombol home & suara yang juga menempel di kiri atas) */
+  .timer-box {
+    top: 72px;
+    left: 14px;
+    width: max-content;
+    max-width: calc(var(--free-left) - 28px);
+  }
+  .scoreboard {
+    top: 124px;
+    left: 14px;
+    max-width: calc(var(--free-left) - 28px);
+  }
+
+  /* kiri bawah: keterangan giliran lalu dadu */
+  /* Ditumpuk di atas dadu. Tinggi dadu = nilai clamp + padding 2x10px +
+     border 2x3px (kotaknya content-box), lalu + 14px jarak bawah dadu
+     + 16px sela. Kalau ukuran dadu diubah, angka ini ikut disesuaikan. */
+  .info-panel {
+    left: 14px;
+    bottom: calc(clamp(74px, 11vh, 110px) + 64px);
+    margin: 0;
+    flex-grow: 0;
+    max-width: calc(var(--free-left) - 28px);
+    padding: 9px 14px;
+    border-radius: var(--game-radius);
+  }
+  /* bottom 22px: dadu punya bayangan tebal 8px di bawahnya, kalau cuma
+     14px bayangannya kepotong tepi layar dan dadunya terlihat terpangkas */
+  .dice-box { left: 14px; bottom: 22px; }
+
+  /* kanan bawah: Mulai Ulang */
+  .btn-reset {
+    right: 14px;
+    bottom: 14px;
+    max-width: calc(var(--free-right) - 28px);
+  }
+
+  /* kotak panel dibuat agak buram + bergaris supaya tetap terbaca
+     di atas ilustrasi hutan yang gelap */
+  .timer-box,
+  .scoreboard,
+  .info-panel {
+    background: rgba(255, 251, 238, 0.92);
+    border: 2px solid rgba(116, 68, 27, 0.4);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* dipadatkan supaya muat di pinggir kiri yang sempit */
+  #scoreboardList { gap: 4px; }
+  #scoreboardList.two-col { grid-template-columns: 1fr; gap: 4px; }
+  #scoreboardList.two-col .player-score { padding: 4px 8px; font-size: 12px; }
+  #scoreboardList.two-col .player-status { display: none; }
+  .scoreboard { padding: 8px 11px; min-width: 0; }
+  .scoreboard h3 { margin: 0 0 5px; font-size: 14px; }
+  .timer-box { padding: 8px 12px; font-size: 14px; min-width: 0; white-space: normal; }
+  .turn-text { font-size: 14px; }
+  #diceStatus { font-size: 12px; }
+}
+
+/* ---------- Dice ---------- */
+.dice-box {
+  width: clamp(74px, 11vh, 110px);
+  min-width: clamp(74px, 11vh, 110px);
+  height: clamp(74px, 11vh, 110px);
+  background: linear-gradient(180deg, #f9a825 0%, #ff8f00 100%);
+  border: 3px solid #5d4037;
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #8d6e63, 0 14px 28px rgba(93,64,55,0.2);
+  user-select: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dice-box:hover {
+  filter: brightness(1.04);
+  transform: translateY(-2px);
+}
+
+.dice-box:active {
+  transform: translateY(4px) scale(0.98);
+  box-shadow: 0 4px 0 #8d6e63, 0 8px 16px rgba(93,64,55,0.15);
+}
+
+.dice-box .dice-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.dice-face {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  place-items: center;
+  padding: 7px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff 0%, #e7edf1 100%);
+  box-shadow: inset -5px -6px 10px rgba(113,126,139,0.15), inset 4px 4px 8px rgba(255,255,255,0.9), 0 6px 12px rgba(64,42,32,0.18);
+  transform: rotate(-8deg);
+}
+
+.dice-face .pip {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #24323a;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 1px 2px rgba(0,0,0,0.1);
+  opacity: 0;
+}
+
+/* Pip grid positions */
+.dice-face .pip:nth-child(1) { grid-column: 1; grid-row: 1; }
+.dice-face .pip:nth-child(2) { grid-column: 2; grid-row: 1; }
+.dice-face .pip:nth-child(3) { grid-column: 3; grid-row: 1; }
+.dice-face .pip:nth-child(4) { grid-column: 1; grid-row: 2; }
+.dice-face .pip:nth-child(5) { grid-column: 2; grid-row: 2; }
+.dice-face .pip:nth-child(6) { grid-column: 3; grid-row: 2; }
+.dice-face .pip:nth-child(7) { grid-column: 1; grid-row: 3; }
+.dice-face .pip:nth-child(8) { grid-column: 2; grid-row: 3; }
+.dice-face .pip:nth-child(9) { grid-column: 3; grid-row: 3; }
+
+/* Pip visibility per dice value */
+.dice-face[data-value="1"] .pip:nth-child(5),
+.dice-face[data-value="2"] .pip:nth-child(1),
+.dice-face[data-value="2"] .pip:nth-child(9),
+.dice-face[data-value="3"] .pip:nth-child(1),
+.dice-face[data-value="3"] .pip:nth-child(5),
+.dice-face[data-value="3"] .pip:nth-child(9),
+.dice-face[data-value="4"] .pip:nth-child(1),
+.dice-face[data-value="4"] .pip:nth-child(3),
+.dice-face[data-value="4"] .pip:nth-child(7),
+.dice-face[data-value="4"] .pip:nth-child(9),
+.dice-face[data-value="5"] .pip:nth-child(1),
+.dice-face[data-value="5"] .pip:nth-child(3),
+.dice-face[data-value="5"] .pip:nth-child(5),
+.dice-face[data-value="5"] .pip:nth-child(7),
+.dice-face[data-value="5"] .pip:nth-child(9),
+.dice-face[data-value="6"] .pip:nth-child(1),
+.dice-face[data-value="6"] .pip:nth-child(3),
+.dice-face[data-value="6"] .pip:nth-child(4),
+.dice-face[data-value="6"] .pip:nth-child(6),
+.dice-face[data-value="6"] .pip:nth-child(7),
+.dice-face[data-value="6"] .pip:nth-child(9) {
+  opacity: 1;
+}
+
+/* Dice animations */
+.dice-box.rolling { animation: diceButtonBounce 0.42s infinite alternate; }
+.dice-box.rolling .dice-face,
+.start-dice-face.rolling { animation: diceRoll 0.48s linear infinite; }
+
+@keyframes diceButtonBounce {
+  from { transform: translateY(0) rotate(-1deg); }
+  to { transform: translateY(-6px) rotate(2deg); }
+}
+
+@keyframes diceRoll {
+  0% { transform: rotate(-8deg) scale(1) translateY(0); }
+  35% { transform: rotate(22deg) scale(1.08) translateY(-4px); }
+  70% { transform: rotate(-18deg) scale(0.98) translateY(2px); }
+  100% { transform: rotate(352deg) scale(1) translateY(0); }
+}
+
+.dice-box.shaking { animation: shake 0.3s infinite; }
+.dice-box.rolling.shaking { animation: diceButtonBounce 0.42s infinite alternate; }
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* ---------- Info Panel ---------- */
+.info-panel {
+  text-align: left;
+  margin-left: 8px;
+  flex-grow: 1;
+}
+
+.turn-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #5d4037;
+}
+
+.turn-highlight {
+  font-weight: 800;
+  font-size: 18px;
+}
+
+/* ---------- Reset Button ---------- */
+.btn-reset {
+  background: linear-gradient(135deg, #1a6b3c 0%, #2d8a54 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(26,107,60,0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-reset:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(26,107,60,0.3);
+}
+
+.btn-reset:active {
+  transform: translateY(0);
+}
+
+/* ---------- Modals ---------- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  /* Guliran dipindah ke lapisan luar ini (dulu di kotak popup-nya).
+     Alasannya: kepala ular pada papan menjulur ke atas kotak, dan
+     kalau kotaknya sendiri yang overflow:auto, ularnya ikut terpotong.
+     Kotaknya dipusatkan dengan margin:auto — bukan align-items —
+     supaya isi yang lebih tinggi dari layar tidak terpangkas di atas. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* padding atas 62px: kepala ular menjulur ~12% lebar papan ke atas
+     (maksimum ~50px), tanpa ruang ini kepalanya terpotong tepi layar
+     saat isi pop up lebih tinggi daripada layar */
+  padding: 62px 12px 26px;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   RANGKA PAPAN KAYU UNTUK SEMUA POP UP
+
+   Papannya (asset/papan-kayu.*) dipasang sebagai border-image 9-irisan,
+   bukan background yang dilebarkan. Bedanya: dengan 9-irisan, keempat
+   sudut membulatnya tetap utuh berapa pun tinggi isi pop up — kalau
+   pakai background 100% 100%, sudutnya ikut melar jadi lonjong.
+   Irisan 44px diambil dari radius sudut aslinya (110px pada papan
+   1898px, jadi 44px pada berkas 760px).
+
+   Kepala ularnya file terpisah (asset/papan-ular.*) yang ditempel
+   lewat ::before, karena posisinya menjulur ke atas papan.
+   ============================================ */
+.papan-kayu,
+.modal-simple,
+.modal-box {
+  position: relative;
+  /* border-box: lebar yang ditulis sudah termasuk tepi papan 26px dan
+     padding — tanpa ini kotaknya jadi ~100px lebih lebar dan meluber
+     di layar ponsel */
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 26px;
+  border-color: transparent;
+  border-radius: 24px;
+  border-image-source: url('../gambar/papan-kayu.png');
+  border-image-source: image-set(
+    url('../gambar/papan-kayu.webp') type('image/webp'),
+    url('../gambar/papan-kayu.png') type('image/png'));
+  border-image-slice: 44 fill;
+  border-image-repeat: stretch;
+  background: none;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  color: #4a3520;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  text-align: center;
+}
+
+/* Kepala ular yang nongol di tepi atas papan.
+   Hanya KEPALANYA (asset/papan-ular.* = 304x212). Badan yang menggulung
+   dulu ikut tercetak di papan kayunya; itu dihapus (aslinya disimpan di
+   asset/papan-kayu-ular.* dan asset/papan-ular-penuh.*) karena badannya
+   ikut melar mengikuti tinggi pop up dan menimpa judul.
+   Ukuran & posisinya dihitung dari gambar aslinya: papan kayu selebar
+   1897px, kepala ular menempati x 1176..1580 dan y 148..430, sedangkan
+   tepi atas papan ada di y 370. Jadi lebarnya 404/1897 = 21,32% papan,
+   mulai (1176-427)/1897 = 39,48% dari kiri papan, dan 222/282 = 78,75%
+   tingginya berada di atas papan.
+
+   Kenapa pakai calc((100% + 52px) * ...): persen pada elemen absolut
+   dihitung dari kotak-padding, yaitu lebar papan MINUS tepi 2x26px.
+   Menambah 52px dulu membuat perhitungannya kembali ke lebar papan
+   utuh, jadi ularnya duduk pas di berapa pun lebar pop up. */
+.papan-kayu::before,
+.modal-simple::before,
+.modal-box::before {
+  content: "";
+  position: absolute;
+  left: calc((100% + 52px) * 0.389562 - 26px);
+  top: 0;
+  width: calc((100% + 52px) * 0.259884);
+  aspect-ratio: 493 / 483;
+  transform: translateY(-47.412%);
+  background: url('../gambar/papan-ular.png') no-repeat center center / 100% 100%;
+  background-image: image-set(
+    url('../gambar/papan-ular.webp') type('image/webp'),
+    url('../gambar/papan-ular.png') type('image/png'));
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.34));
+  pointer-events: none;
+  z-index: 2;
+  /* mengangguk pelan supaya maskotnya terasa hidup; amplitudonya kecil
+     (1,8% tinggi ular ~ 2px) jadi tidak mengganggu bacaan */
+  animation: ularMengangguk 4.2s ease-in-out infinite;
+}
+
+@keyframes ularMengangguk {
+  0%, 100% { transform: translateY(-47.412%); }
+  50%      { transform: translateY(-49.2%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .papan-kayu::before,
+  .modal-simple::before,
+  .modal-box::before { animation: none; }
+}
+
+
+/* Padding-atas mengikuti lebar pop up: dagu ular menjulur 3,16% lebar
+   papan ke bawah dari tepi dalam bingkai, jadi ruangnya harus segitu
+   plus jarak baca, kalau tidak judul pop up tertimpa ularnya. Rumusnya
+   memakai lebar pop up yang sama seperti di properti width di bawah. */
+.modal-simple {
+  padding: calc(min(93vw, 420px) * 0.1339 + 18px) 22px 24px;
+  max-width: 420px;
+  width: min(93vw, 420px);
+  margin: auto;          /* pemusat aman: lihat catatan di .modal-overlay */
+}
+
+/* Papannya sudah punya ular sendiri, jadi maskot ular SVG di pop up
+   selamat datang dimatikan supaya tidak ada dua ular sekaligus. */
+.welcome-mascot { display: none; }
+
+.modal-simple h2 {
+  margin: 0 0 14px;
+  font-size: 25px;
+  font-weight: 800;
+  color: var(--wood-cream);
+  letter-spacing: 0.02em;
+  text-shadow: var(--wood-text-shadow);
+}
+
+.modal-simple p {
+  margin: 9px 0 0;
+  padding: 13px 15px;
+  background: linear-gradient(180deg, var(--paper-1) 0%, var(--paper-2) 100%);
+  border: 2.5px solid var(--wood-mid);
+  border-radius: 15px;
+  box-shadow: 0 4px 0 rgba(90,54,26,0.3), inset 0 2px 0 rgba(255,255,255,0.85);
+  color: var(--wood-ink);
+  font-weight: 600;
+  line-height: 1.65;
+  font-size: 14.5px;
+  text-align: left;
+}
+
+.modal-simple .modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 22px;
+}
+
+.modal-simple .modal-actions button {
+  flex: 1 1 120px;
+  min-width: 120px;
+  border: none;
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f9a825, #ff8f00);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(249,168,37,0.25);
+  transition: all 0.2s ease;
+}
+
+.modal-simple .modal-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(249,168,37,0.35);
+}
+
+.modal-simple .modal-actions button:active {
+  transform: translateY(0);
+}
+
+.modal-simple .btn-close-popup {
+  margin-top: 22px;
+  min-width: 120px;
+  background: linear-gradient(135deg, #ffc44d 0%, #f9a825 55%, #ef6c00 100%);
+  color: white;
+  font-family: inherit;
+  font-weight: 800;
+  border: 2.5px solid var(--wood-cream);
+  border-radius: 14px;
+  padding: 11px 24px;
+  font-size: 16px;
+  text-shadow: 0 1px 2px rgba(150,80,10,0.6);
+  box-shadow: 0 4px 0 rgba(120,72,20,0.5), 0 7px 16px rgba(0,0,0,0.28);
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.modal-simple .btn-close-popup:hover { transform: translateY(-2px); }
+.modal-simple .btn-close-popup:active { transform: translateY(0); }
+
+/* ---------- Start Order Modal ---------- */
+.start-order-result {
+  margin: 14px auto;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff9c4 0%, #ffeeb0 100%);
+  border: 2.5px solid #d99a2b;
+  box-shadow: 0 3px 0 rgba(140,90,20,0.3);
+  color: #5d4037;
+  font-weight: 800;
+  font-size: 14px;
+  min-height: 24px;
+}
+
+.start-dice-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 18px auto;
+}
+
+.start-dice-face {
+  width: 86px;
+  height: 86px;
+  border-radius: 22px;
+  padding: 12px;
+}
+
+.start-dice-face .pip { width: 11px; height: 11px; }
+
+.start-player-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--paper-1) 0%, var(--paper-2) 100%);
+  border: 2.5px solid var(--wood-mid);
+  box-shadow: 0 3px 0 rgba(90,54,26,0.3);
+  color: var(--wood-ink);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.start-player-chip img { width: 30px; height: 30px; }
+
+.start-order-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.start-order-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, var(--paper-1) 0%, var(--paper-2) 100%);
+  border: 2.5px solid var(--wood-mid);
+  box-shadow: 0 3px 0 rgba(90,54,26,0.28);
+  color: var(--wood-ink);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.start-order-list li span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.start-order-list li.active {
+  background: rgba(255,249,196,0.7);
+  border-color: #f9a825;
+  box-shadow: 0 4px 14px rgba(249,168,37,0.12);
+}
+
+.start-order-list img { width: 24px; height: 24px; }
+
+#startOrderDiceBtn.rolling { animation: diceButtonBounce 0.42s infinite alternate; }
+
+/* ---------- Quiz Modal ---------- */
+.modal-box {
+  /* lihat catatan padding-atas di .modal-simple */
+  padding: calc(min(93vw, 400px) * 0.1339 + 18px) 22px 24px;
+  width: min(93vw, 400px);
+  margin: auto;
+  animation: zoomIn 0.3s ease;
+}
+
+/* ---------- Tombol tutup (bulat, di sudut kanan atas papan) ---------- */
+.popup-close {
+  position: absolute;
+  top: -16px;
+  right: -14px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 3px solid #fff3d6;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #a5622a 0%, #74441b 100%);
+  color: #fff8e1;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 3;
+  box-shadow: 0 4px 0 rgba(74, 40, 14, 0.6), 0 7px 16px rgba(0, 0, 0, 0.4);
+  transition: transform 0.16s ease, filter 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.popup-close:hover { transform: scale(1.09); filter: brightness(1.08); }
+.popup-close:active { transform: scale(0.95) translateY(2px); box-shadow: 0 1px 0 rgba(74, 40, 14, 0.6); }
+.popup-close:focus-visible { outline: 3px solid #ffd54f; outline-offset: 3px; }
+
+.quiz-animal {
+  font-size: 42px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.modal-box h3 {
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--wood-cream);
+  margin: 4px 0 2px;
+  text-shadow: var(--wood-text-shadow);
+}
+
+.quiz-question {
+  font-size: 30px;
+  font-weight: 800;
+  color: #1a6b3c;
+  margin: 12px 0 14px;
+  padding: 16px 14px;
+  background: linear-gradient(180deg, var(--paper-1) 0%, var(--paper-2) 100%);
+  border: 3px solid var(--wood-mid);
+  border-radius: 16px;
+  box-shadow: var(--paper-shadow);
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  line-height: 1.4;
+}
+
+.quiz-input {
+  padding: 10px;
+  font-size: 22px;
+  width: 150px;
+  text-align: center;
+  color: var(--wood-ink);
+  background: #fffdf5;
+  border: 3px solid var(--wood-mid);
+  border-radius: 12px;
+  box-shadow: inset 0 2px 5px rgba(90,54,26,0.18);
+  outline: none;
+  font-family: inherit;
+  font-weight: 700;
+  transition: border-color 0.2s;
+}
+
+.quiz-input:focus { border-color: #1a6b3c; }
+
+.btn-submit {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, #4caf50 0%, #1a6b3c 100%);
+  color: white;
+  border: 2.5px solid var(--wood-cream);
+  border-radius: 14px;
+  font-size: 16.5px;
+  font-weight: 800;
+  cursor: pointer;
+  text-shadow: 0 1px 2px rgba(10,50,25,0.6);
+  box-shadow: 0 4px 0 rgba(20,70,40,0.55), 0 7px 16px rgba(0,0,0,0.28);
+  transition: all 0.2s ease;
+}
+
+.btn-submit:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(20,70,40,0.55);
+}
+
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,107,60,0.3); }
+.btn-submit:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(26,107,60,0.2); }
+
+#error-msg {
+  color: #ffcdd2;
+  text-shadow: 0 1px 3px rgba(74,40,14,0.9);
+  font-weight: 700;
+  margin-top: 10px;
+  min-height: 18px;
+  font-size: 13px;
+}
+
+/* ---------- Snake Mascot ---------- */
+/* .welcome-mascot sengaja tidak ikut di sini: papan pop up sudah punya
+   kepala ular sendiri, jadi maskot SVG-nya dimatikan (lihat aturan
+   .welcome-mascot { display: none } di bagian rangka papan di atas).
+   Kalau ikut dipasang display:flex, aturan ini menang karena letaknya
+   lebih bawah, dan ularnya jadi dua. */
+.feedback-mascot {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.snake-mascot-svg {
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.12));
+  animation: snakeBounce 2.5s ease-in-out infinite;
+}
+
+@keyframes snakeBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(-3deg); }
+  75% { transform: translateY(-3px) rotate(3deg); }
+}
+
+/* ---------- LKPD Notice ---------- */
+.warn-emoji {
+  font-size: 46px;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
+}
+
+.lkpd-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 12px 0 6px;
+  padding: 14px 16px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #fff9c4 0%, #ffeeb0 100%);
+  border: 2.5px solid #d99a2b;
+  box-shadow: 0 4px 0 rgba(140,90,20,0.32), inset 0 2px 0 rgba(255,255,255,0.8);
+  text-align: left;
+}
+
+.lkpd-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.lkpd-text {
+  font-size: 12.5px;
+  color: #5d4037;
+  line-height: 1.55;
+}
+
+.lkpd-text strong {
+  color: #e65100;
+  font-weight: 800;
+}
+
+/* ---------- Feedback Card (BENAR/SALAH) ---------- */
+.feedback-card {
+  background: var(--wood-mid) url('../gambar/wood-texture.png') repeat center center;
+  border: 5px solid var(--wood-dark);
+  padding: 24px 20px 20px;
+  border-radius: 22px;
+  width: min(93vw, 340px);
+  text-align: center;
+  box-shadow: var(--wood-frame-shadow);
+  animation: zoomIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.feedback-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+}
+
+.feedback-card-correct { border: 2.5px solid #4caf50; }
+.feedback-card-correct::before { background: linear-gradient(90deg, #4caf50, #81c784); }
+
+.feedback-card-wrong { border: 2.5px solid #e53935; }
+.feedback-card-wrong::before { background: linear-gradient(90deg, #e53935, #ef5350); }
+
+.feedback-badge {
+  display: inline-block;
+  padding: 7px 26px;
+  border-radius: 999px;
+  border: 2.5px solid var(--wood-cream);
+  box-shadow: 0 4px 0 rgba(74,40,14,0.45), 0 6px 14px rgba(0,0,0,0.28);
+  font-size: 22px;
+  font-weight: 800;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.feedback-correct {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  color: #1b5e20;
+}
+
+.feedback-wrong {
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  color: #b71c1c;
+}
+
+.feedback-text {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--wood-ink);
+  line-height: 1.55;
+  margin-bottom: 16px;
+  padding: 13px 15px;
+  background: linear-gradient(180deg, var(--paper-1) 0%, var(--paper-2) 100%);
+  border: 2.5px solid var(--wood-mid);
+  border-radius: 15px;
+  box-shadow: 0 4px 0 rgba(90,54,26,0.3), inset 0 2px 0 rgba(255,255,255,0.85);
+}
+
+.feedback-btn {
+  display: inline-block;
+  padding: 11px 30px;
+  border: 2.5px solid var(--wood-cream);
+  border-radius: 14px;
+  font-size: 15.5px;
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  box-shadow: 0 4px 0 rgba(74,40,14,0.45), 0 7px 16px rgba(0,0,0,0.28);
+}
+
+.feedback-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(74,40,14,0.45);
+}
+
+.feedback-btn-correct {
+  background: linear-gradient(135deg, #4caf50, #388e3c);
+  box-shadow: 0 4px 14px rgba(76,175,80,0.3);
+}
+
+.feedback-btn-correct:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(76,175,80,0.4); }
+
+.feedback-btn-wrong {
+  background: linear-gradient(135deg, #e53935, #c62828);
+  box-shadow: 0 4px 14px rgba(229,57,53,0.3);
+}
+
+.feedback-btn-wrong:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(229,57,53,0.4); }
+
+.feedback-snake {
+  width: 56px;
+  height: 56px;
+}
+
+/* ---------- Player Select ---------- */
+.player-option {
+  border: 2px solid transparent;
+  background: rgba(255,255,255,0.9);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.player-option.disabled { opacity: 0.4; pointer-events: none; }
+.player-option:hover { transform: translateY(-3px); border-color: #f9a825; }
+.player-option.selected { border-color: #ff8f00; box-shadow: inset 0 0 0 1px #ff8f00; }
+.player-option img { width: 48px; height: 48px; margin-bottom: 10px; }
+.player-option-name { font-size: 14px; font-weight: 700; color: #5d4037; }
+
+.select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* ---------- Win Modal ---------- */
+.win-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.6);
+  z-index: 1500;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.win-modal-box {
+  color: var(--wood-cream);
+  background: var(--wood-mid) url('../gambar/wood-texture.png') repeat center center;
+  border: 5px solid var(--wood-dark);
+  border-radius: 22px;
+  padding: 28px 20px 24px;
+  max-width: 390px;
+  width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  text-align: center;
+  position: relative;
+  box-shadow: var(--wood-frame-shadow);
+  animation: zoomIn 0.28s cubic-bezier(0.65,1.3,0.4,1.01);
+}
+
+.win-modal-title {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  color: var(--wood-cream);
+  text-shadow: var(--wood-text-shadow);
+  line-height: 1.2;
+  margin: 6px 0 5px;
+}
+
+.win-modal-sub {
+  font-size: 19px;
+  margin-top: 8px;
+  margin-bottom: 0;
+  color: #ffd54f;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 4px rgba(74,40,14,0.9);
+}
+
+.win-modal-btns {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.win-modal-btn {
+  min-width: 110px;
+  border: 2.5px solid var(--wood-cream);
+  border-radius: 14px;
+  padding: 11px 22px;
+  font-size: 15.5px;
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(120,72,20,0.5), 0 7px 16px rgba(0,0,0,0.28);
+  background: linear-gradient(135deg, #ffc44d 0%, #f9a825 55%, #ef6c00 100%);
+  color: white;
+  text-shadow: 0 1px 2px rgba(150,80,10,0.6);
+  transition: all 0.2s ease;
+}
+
+.win-modal-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(120,72,20,0.5);
+}
+
+.win-modal-btn:hover { transform: translateY(-2px); }
+.win-modal-btn:active { transform: translateY(0); }
+.win-modal-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+.win-modal-emoji {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.win-modal-emoji img { width: 64px; height: 64px; }
+
+/* ---------- Podium Stage ---------- */
+.podium-stage {
+  margin: 16px 0 8px;
+}
+
+.podium-display {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+}
+
+.podium-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+}
+
+.podium-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.podium-player img {
+  width: 40px;
+  height: 40px;
+}
+
+.podium-name {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--wood-cream);
+  text-shadow: 0 2px 4px rgba(74, 40, 14, 0.95);
+}
+
+.podium-medal {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.podium-block {
+  width: 100%;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.podium-rank {
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.podium-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  text-align: left;
+}
+
+.podium-list li {
+  padding: 10px 14px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, var(--paper-1) 0%, var(--paper-2) 100%);
+  border: 2.5px solid var(--wood-mid);
+  box-shadow: 0 3px 0 rgba(90,54,26,0.28);
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--wood-ink);
+}
+
+.podium-list li span:last-child {
+  float: right;
+  color: #1a6b3c;
+  font-weight: 800;
+}
+
+/* ---------- Animations ---------- */
+@keyframes zoomIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .top-btn-bar { top: 12px; left: 10px; gap: 10px; }
+  .back-btn { width: 38px; height: 38px; }
+  .back-btn .icon-home { width: 17px; height: 17px; }
+}
+
+@media (max-width: 720px) {
+  .controls {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 12px;
+    padding: 14px;
+  }
+  .info-panel { margin-left: 0; text-align: center; }
+  .dice-box { width: 100px; min-width: 100px; height: 100px; }
+  .start-dice-stage { flex-direction: column; gap: 12px; }
+  .start-order-list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .top-btn-bar { top: 8px; left: 8px; gap: 8px; }
+  .back-btn { width: 34px; height: 34px; }
+  .back-btn .icon-home { width: 15px; height: 15px; }
+  .audio-volume-slider { width: 70px; }
+  .audio-dropdown-container { top: 50px; }
+  .board-container { border-width: 3px; border-radius: 14px; }
+  .game-wrapper { padding: 10px; border-radius: 16px; }
+}
+
+
+/* ---------- Petak papan bergambar ----------
+   Semua pewarnaan/nomor petak versi lama dihapus: papan sekarang berupa
+   ilustrasi, jadi petaknya tidak boleh ditimpa kotak berwarna lagi.
+   Yang tersisa hanya penanda halus untuk petak yang sedang ditempati. */
+.cell.cell-active {
+  box-shadow: 0 0 0 3px rgba(255, 241, 118, 0.95),
+              0 0 14px 4px rgba(255, 213, 79, 0.6);
+  background: rgba(255, 245, 157, 0.22);
+}
+
+
+/* ============================================
+   KARTU BENAR! / SALAH!  — mengikuti acuan
+   dokumen klien: panel hijau/merah, ular nongol
+   di tepi atas, tulisan tebal beroutline.
+   Bingkai kayunya tetap (permintaan sebelumnya).
+   ============================================ */
+.feedback-card { padding: 14px 13px 13px; overflow: visible; }
+
+.feedback-panel {
+  position: relative;
+  margin-top: 26px;             /* ruang untuk ular di tepi atas */
+  padding: 44px 18px 18px;      /* ikon centang/silang tidak menabrak ular */
+  border-radius: 20px;
+  border: 3px solid transparent;
+  text-align: center;
+}
+
+.feedback-panel.panel-ok {
+  background: linear-gradient(180deg, #eef8dc 0%, #d7eeb4 100%);
+  border-color: #57a13a;
+  box-shadow: 0 5px 0 rgba(40, 90, 25, 0.35), inset 0 2px 0 rgba(255,255,255,0.85);
+}
+
+.feedback-panel.panel-no {
+  background: linear-gradient(180deg, #fdeaea 0%, #f8cccc 100%);
+  border-color: #c0392b;
+  box-shadow: 0 5px 0 rgba(120, 30, 25, 0.32), inset 0 2px 0 rgba(255,255,255,0.85);
+}
+
+/* Ular melingkar di tepi atas kartu */
+.feedback-mascot {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 118px;
+  pointer-events: none;
+}
+
+.feedback-mascot .snake-mascot-svg {
+  width: 118px;
+  height: 91px;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.28));
+}
+
+/* Ikon centang / silang dalam bulatan */
+.feedback-icon {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  border: 3px solid #fff;
+}
+
+.feedback-icon.ok {
+  background: linear-gradient(180deg, #66bb6a, #2e7d32);
+  box-shadow: 0 3px 0 rgba(30, 80, 20, 0.4);
+}
+
+.feedback-icon.no {
+  background: linear-gradient(180deg, #ef5350, #b71c1c);
+  box-shadow: 0 3px 0 rgba(110, 20, 15, 0.4);
+}
+
+/* BENAR! / SALAH! — huruf tebal dengan outline putih */
+.feedback-badge {
+  display: block;
+  padding: 0;
+  margin-bottom: 6px;
+  border: none;
+  box-shadow: none;
+  background: none;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-size: clamp(28px, 6vw, 38px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.feedback-badge.feedback-correct {
+  color: #4c9a2a;
+  text-shadow:
+    2px 2px 0 #fff, -2px 2px 0 #fff, 2px -2px 0 #fff, -2px -2px 0 #fff,
+    0 4px 0 rgba(40, 90, 25, 0.35);
+}
+
+.feedback-badge.feedback-wrong {
+  color: #d32f2f;
+  text-shadow:
+    2px 2px 0 #fff, -2px 2px 0 #fff, 2px -2px 0 #fff, -2px -2px 0 #fff,
+    0 4px 0 rgba(120, 30, 25, 0.32);
+}
+
+.feedback-text {
+  margin: 0 0 10px;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: none;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #4a3520;
+}
+
+/* keterangan kecil: jawaban yang benar */
+.feedback-note {
+  margin: -4px 0 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #8d4a44;
+}
+
+.feedback-panel .feedback-btn {
+  padding: 10px 30px;
+  border-radius: var(--radius-full, 999px);
+  border: 2.5px solid #fff;
+}
+
+.feedback-btn.feedback-btn-correct {
+  background: linear-gradient(180deg, #7cb342 0%, #4c8c26 100%);
+  box-shadow: 0 4px 0 rgba(40, 90, 25, 0.45);
+}
+
+.feedback-btn.feedback-btn-wrong {
+  background: linear-gradient(180deg, #e35b52 0%, #b3241b 100%);
+  box-shadow: 0 4px 0 rgba(110, 20, 15, 0.45);
+}
+
+
+/* ============================================
+   PODIUM — abu-abu 3D dengan angka metalik,
+   mengikuti acuan dokumen klien halaman 4
+   ============================================ */
+.podium-display {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.podium-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.podium-block {
+  position: relative;
+  flex-shrink: 0;      /* jangan ikut menyusut — tingginya menandakan peringkat */
+  width: 78px;
+  border-radius: 6px 6px 3px 3px;
+  display: grid;
+  place-items: center;
+  /* balok batu abu-abu: sisi atas terang, badan gelap */
+  background: linear-gradient(180deg, #6e7479 0%, #565c61 18%, #43484d 100%);
+  border: 2px solid #33383c;
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35),
+    0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* bibir atas balok supaya terlihat tiga dimensi */
+.podium-block::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: -4px;
+  right: -4px;
+  height: 9px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #868c91 0%, #5f656a 100%);
+  border: 2px solid #33383c;
+}
+
+.podium-rank {
+  position: relative;
+  z-index: 1;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  color: #e6e9ec;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.45),
+    0 0 10px rgba(255, 255, 255, 0.25);
+}
+
+/* juara 1 emas, 2 perak, 3 tembaga */
+.podium-block.rank-1 .podium-rank {
+  color: #f3c34a;
+  text-shadow: 0 2px 0 #8a6410, 0 0 12px rgba(243, 195, 74, 0.55);
+}
+
+.podium-block.rank-2 .podium-rank {
+  color: #dfe4e8;
+  text-shadow: 0 2px 0 #6d7478, 0 0 10px rgba(223, 228, 232, 0.45);
+}
+
+.podium-block.rank-3 .podium-rank {
+  color: #d99a5b;
+  text-shadow: 0 2px 0 #7d4f1f, 0 0 10px rgba(217, 154, 91, 0.45);
+}
+
+@media (max-width: 480px) {
+  .podium-block { width: 62px; }
+  .podium-rank { font-size: 31px; }
+}
+
+
+/* ============================================
+   KARTU BENAR! / SALAH! — memakai artwork asli
+   dari dokumen klien (asset/card-*.png).
+   Aturan kayu & panel sebelumnya di-reset di sini
+   karena desain ini wajib sama dengan acuan.
+   ============================================ */
+.fb-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+}
+
+.feedback-card {
+  position: relative;
+  width: min(88vw, 358px);
+  max-width: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  animation: zoomIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Kedua artwork dipramuat lalu ditukar lewat kelas .fb-benar / .fb-salah,
+   jadi tidak ada kedip saat gambar berganti. Rasio tiap kartu berbeda,
+   karena itu tinggi kotaknya ikut gambar yang sedang tampil. */
+.fb-pic { display: block; }
+.fb-benar .fb-pic-salah,
+.fb-salah .fb-pic-benar { display: none; }
+
+.fb-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
+}
+
+/* Teks bertumpuk pada artwork. Semua persen di bawah diukur langsung
+   dari kedua berkas kiriman klien:
+     BENAR  900x1093 : slot pesan top 72.23% h 13.94%, tombol y 86.87%
+     SALAH  900x1149 : slot pesan top 70.00% h 17.10%, tombol y 88.19%
+   Titik tengah kartu: BENAR 48.0%, SALAH 49.9%. */
+.fb-sub,
+.fb-msg {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-weight: 800;
+  line-height: 1.16;
+  text-wrap: balance;
+  pointer-events: none;
+}
+
+/* kartu BENAR — "<Nama> maju <n> langkah." (berubah tiap giliran) */
+.fb-sub {
+  left: 22.0%;
+  width: 52%;
+  top: 72.23%;
+  height: 13.94%;
+  color: #33421f;
+  font-size: clamp(12px, 4.2vw, 18px);
+}
+
+/* kartu SALAH — kalimat penyemangat (tetap, sesuai acuan klien) */
+.fb-msg {
+  left: 21.9%;
+  width: 56%;
+  top: 70.00%;
+  height: 17.10%;
+  color: #6b201a;
+  font-size: clamp(12px, 4.2vw, 18px);
+}
+
+.fb-salah .fb-sub,
+.fb-benar .fb-msg { display: none; }
+
+/* Area klik di atas tombol yang tergambar. Pada kartu BENAR tulisan
+   "Lanjutkan" sudah ada di artwork, sedangkan tombol kartu SALAH masih
+   kosong — jadi labelnya ditulis lewat HTML. */
+.fb-btn-hit {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fb-benar .fb-btn-hit { left: 26.66%; width: 42.73%; top: 86.87%; height: 12.67%; }
+.fb-salah .fb-btn-hit { left: 27.96%; width: 43.85%; top: 88.19%; height: 10.81%; }
+
+.fb-btn-label {
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-weight: 800;
+  color: #fff;
+  font-size: clamp(13px, 4.4vw, 19px);
+  line-height: 1;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 2px rgba(92, 16, 10, 0.55);
+  pointer-events: none;
+}
+
+.fb-benar .fb-btn-label { display: none; }   /* sudah tergambar di artwork */
+
+.fb-btn-hit:hover { filter: brightness(1.06); }
+.fb-btn-hit:active { transform: translateY(2px); }
+.fb-btn-hit:focus-visible { outline: 3px solid #fff8e1; outline-offset: 2px; }
+
+/* Keterangan jawaban benar — di luar artwork supaya desainnya tetap utuh */
+.fb-note {
+  margin-top: 14px;
+  padding: 9px 18px;
+  border-radius: var(--radius-full, 999px);
+  background: rgba(58, 30, 8, 0.9);
+  border: 2px solid rgba(255, 233, 184, 0.5);
+  color: #ffe9b8;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  max-width: min(88vw, 358px);
+  line-height: 1.45;
+}
+
+/* ============================================
+   BATAS WAKTU: 30 MENIT PER PERMAINAN & 1 MENIT PER SOAL
+
+   Dua-duanya hitung mundur. Kelas .mendesak dipasang lewat JS saat
+   waktunya tinggal sedikit (60 detik untuk permainan, 10 detik untuk
+   soal) supaya anak-anak sadar tanpa perlu membaca angkanya.
+   Kedipannya dimatikan kalau pengguna memilih "kurangi gerakan".
+   ============================================ */
+@keyframes waktuBerdenyut {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+
+.timer-box.mendesak {
+  color: #b3261e;
+  border-color: rgba(179, 38, 30, 0.45);
+  background: rgba(255, 240, 238, 0.96);
+  animation: waktuBerdenyut 1s ease-in-out infinite;
+}
+
+/* pencacah di dalam pop up soal */
+.quiz-timer {
+  display: inline-block;
+  margin: 2px auto 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(255, 244, 214, 0.9);
+  border: 2px solid var(--wood-mid, #b07a3c);
+  color: #6b4a1c;
+  font-family: 'Baloo 2', 'Nunito', 'Trebuchet MS', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.quiz-timer strong {
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;   /* angkanya tidak geser-geser */
+}
+
+.quiz-timer.mendesak {
+  background: #ffe9e6;
+  border-color: #d9584d;
+  color: #b3261e;
+  animation: waktuBerdenyut 0.7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer-box.mendesak,
+  .quiz-timer.mendesak { animation: none; }
+}
+
+/* Pengingat menyepakati hewan tiap pemain, di pop up urutan main.
+   Ditulis .modal-simple .start-order-catatan (bukan kelasnya saja)
+   supaya menang atas aturan .modal-simple p yang memberi semua
+   paragraf pop up tampilan kartu krem biasa — kalau kalah, pengingat
+   ini tidak kelihatan beda dari teks di bawahnya. */
+.modal-simple .start-order-catatan {
+  margin: 0 0 10px;
+  padding: 10px 14px 10px 40px;
+  border-radius: 14px;
+  background: #fff3d0;
+  border: 2px dashed #c08a3e;
+  box-shadow: none;
+  color: #6b4a1c;
+  font-size: 14.5px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: left;
+  position: relative;
+}
+
+.modal-simple .start-order-catatan::after {
+  content: "📌";
+  position: absolute;
+  left: 12px;
+  top: 9px;
+  font-size: 18px;
+  line-height: 1.2;
+}
